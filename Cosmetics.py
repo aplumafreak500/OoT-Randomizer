@@ -547,7 +547,7 @@ def patch_button_colors(rom, settings, log, symbols):
         color_set = None
         # handle random
         if button_option == 'Random Choice':
-            button_option = random.choice(button_colors.keys())
+            button_option = random.choice(list(button_colors.keys()))
         # handle completely random
         if button_option == 'Completely Random':
             color = [random.getrandbits(8), random.getrandbits(8), random.getrandbits(8)]
