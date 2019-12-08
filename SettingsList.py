@@ -1629,9 +1629,6 @@ setting_infos = [
         ''',
         shared         = True,
         disabled_default = 0,
-        gui_params     = {
-            'randomize_key': 'randomize_settings',
-        },
     ),
     Checkbutton(
         name           = 'no_escape_sequence',

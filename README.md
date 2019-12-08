@@ -97,12 +97,14 @@ player.
 * Updated Compressor. The GUI progress bar is now granular. If for some reason, the rom won't fit into 32MB, then the compressor will increase the output size.
 * Cosmetic heart color setting now applies in the file select screen.
 * Ganondorf no longer hints at his Boss Key chest contents.
+* Further seed generation speed improvements.
 
 #### Bug Fixes
 * Minor stability fix in Plando
 * Fixed two chests in MQ Shadow Temple that had swapped names in plando and spoilers
 * Removed (unnecessarily) duplicated/overlapping hints.
 * Randomizing main rules now works correctly.
+* Removed a misleading random "trials" value from the non-randomized settings in the spoiler.
 
 
 ### 5.1
