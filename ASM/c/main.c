@@ -1,3 +1,4 @@
+#include "triforce.h"
 #include "dungeon_info.h"
 #include "file_select.h"
 #include "get_items.h"
@@ -26,13 +27,14 @@ void before_game_state_update() {
     handle_pending_items();
     handle_dpad();
     update_color();
-    update_heart_colors();
+    update_hud_colors();
     process_extern_ctxt();
     override_fog_state();
 }
 
 void after_game_state_update() {
     draw_dungeon_info(&(z64_ctxt.gfx->overlay));
+    draw_triforce_count(&(z64_ctxt.gfx->overlay));
 }
 
 void after_scene_init() {

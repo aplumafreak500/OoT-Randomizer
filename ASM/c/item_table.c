@@ -48,7 +48,7 @@ item_row_t item_table[] = {
     [0x08] = ITEM_ROW(0x53, 0, 0x0A, 0x0036, 0x00DD, 0x2D, no_upgrade, no_effect, -1, -1), // Hookshot
     [0x09] = ITEM_ROW(0x53, 0, 0x0B, 0x004F, 0x00DD, 0x2E, no_upgrade, no_effect, -1, -1), // Longshot
     [0x0A] = ITEM_ROW(0x53, 0, 0x0F, 0x0039, 0x00EA, 0x36, no_upgrade, no_effect, -1, -1), // Lens of Truth
-    [0x0B] = ITEM_ROW(0x53, 0, 0x23, 0x0069, 0x00EF, 0x3B, no_upgrade, no_effect, -1, -1), // Zelda's Letter
+    [0x0B] = ITEM_ROW(0x53, 0, 0x23, 0x0069, 0x00EF, 0x3B, no_upgrade, open_mask_shop, -1, -1), // Zelda's Letter
     [0x0C] = ITEM_ROW(0x53, 0, 0x08, 0x003A, 0x00DE, 0x2F, no_upgrade, no_effect, -1, -1), // Ocarina of Time
     [0x0D] = ITEM_ROW(0x53, 0, 0x11, 0x0038, 0x00F6, 0x41, no_upgrade, no_effect, -1, -1), // Megaton Hammer
     [0x0E] = ITEM_ROW(0x53, 0, 0x2F, 0x0002, 0x0109, 0x5E, no_upgrade, no_effect, -1, -1), // Cojiro
@@ -225,7 +225,7 @@ item_row_t item_table[] = {
     [0xB6] = ITEM_ROW(0x53, 3, 0x41, 0x00A0, 0x00AA, 0x02, no_upgrade, give_small_key, FORT_ID,   -1), // Gerudo Fortress Small Key
     [0xB7] = ITEM_ROW(0x53, 3, 0x41, 0x00A1, 0x00AA, 0x02, no_upgrade, give_small_key, CASTLE_ID, -1), // Ganon's Castle Small Key
 
-    [0xB8] = ITEM_ROW(0x53, 0, 0x41, 0x00E9, 0x00BD, 0x13, no_upgrade, give_defense,      -1, -1), // Double Defense
+    [0xB8] = ITEM_ROW(0x53, 0, 0x41, 0x00E9, 0x0194, 0x13, no_upgrade, give_defense,      -1, -1), // Double Defense
     [0xB9] = ITEM_ROW(0x53, 0, 0x41, 0x00E4, 0x00CD, 0x1E, no_upgrade, give_magic,        -1, -1), // Magic Meter
     [0xBA] = ITEM_ROW(0x53, 0, 0x41, 0x00E8, 0x00CD, 0x1F, no_upgrade, give_double_magic, -1, -1), // Double Magic
 
@@ -246,6 +246,7 @@ item_row_t item_table[] = {
     [0xC7] = ITEM_ROW(0x53, 0, 0x41, 0x00F8, 0x00D1, 0x23, no_upgrade, give_tycoon_wallet, 3, -1), // Tycoon's Wallet
     [0xC8] = ITEM_ROW(0x53, 0, 0x14, 0x9099, 0x010B, 0x45, no_upgrade, no_effect, -1, -1), // Redundant Letter Bottle
     [0xC9] = ITEM_ROW(0x53, 0, 0x41, 0x9048, 0x00F3, 0x3E, no_upgrade, give_bean_pack, -1, -1), // Magic Bean Pack
+    [0xCA] = ITEM_ROW(0x53, 0, 0x41, 0x9003, 0x0193, 0x35, no_upgrade, give_triforce_piece, -1, -1), // Triforce piece
 
 };
 

@@ -2,6 +2,22 @@
 
 This is a randomizer for _The Legend of Zelda: Ocarina of Time_ for the Nintendo 64.
 
+**WARNING:** This branch is a modified version of the randomizer. It is **not** officially supported and may be **very unstable**.
+Please refrain from asking questions and from reporting issues in the main Randomizer Discord when using this branch.
+Instead, you can open an issue on this fork [here](https://github.com/Roman971/OoT-Randomizer/issues) or contact me directly on discord (Roman#7295) for any help, report or request.
+
+Differences between this branch and the main Dev branch (on [Testrunner's Fork](https://github.com/TestRunnerSRL/OoT-Randomizer/tree/Dev)):
+* Various GUI tweaks and improvements along with setting tooltip/option changes
+* "Add Open Kakariko Gate" option to have the gate to Death Mountain being open from the start, as well as the Mask Shop opening upon obtaining Zelda's Letter without needing to show it to the guard from [Cuphat's Open Mask Shop Branch](https://github.com/Cuphat/OoT-Randomizer/tree/open_kak_mask_shop)
+* New cosmetic options to configure HUD Button colors from [Cuphat's HUD Colors Branch](https://github.com/Cuphat/OoT-Randomizer/tree/hud_colors)
+* "Entrance Shuffle" (aka ER) is changed into a set of more advanced and customizable options including mixing entrance pools, decoupling entrances and randomizing overworld spawns or warp songs.
+* Picking up Gold Skulltula Tokens in non-Tokensanity displays a self-closing textbox which no longer freezes the player.
+* "Bombchus In Logic" is improved to include bombchu drops (from grass, pots, etc) that start dropping once you have found Bombchus.
+* New cosmetic option to have all ingame item model colors match cosmetic colors (for hearts, magic and gauntlets), except item drop icons which aren't handled yet.
+* Double Defense has a separate item model to differentiate it from Heart Containers.
+
+## Index
+
 * [Installation](#installation)
 * [General Description](#general-description)
   * [Getting Stuck](#getting-stuck)
@@ -14,13 +30,8 @@ This is a randomizer for _The Legend of Zelda: Ocarina of Time_ for the Nintendo
 
 ## Installation
 
-It is strongly suggested users use the web generator from here:
-
-https://ootrandomizer.com
-
-If you wish to run the script raw, clone this repository and either run ```Gui.py``` for a
-graphical interface or ```OoTRandomizer.py``` for the command line version. They both require Python 3.6+. This will be fully featured,
-but the seeds you generate will have different random factors than the bundled release.
+To run this program, clone or download this repository and either run ```Gui.py``` for a graphical interface or ```OoTRandomizer.py``` for the command line version. 
+They both require Python 3.6+.
 
 This randomizer requires The Legend of Zelda: Ocarina of Time version ```1.0 NTSC-US```. This randomizer includes an in-built decompressor, but if
 the user wishes a pre-decompressed ROM may be supplied as input. Please be sure your input ROM filename is either a .n64 or .z64 file. For users
@@ -69,6 +80,32 @@ do that.
 player.
 
 ## Changelog
+
+#### New Features
+* Triforce Hunt
+  * Collect some number of Triforce Pieces to beat the game instead of beating Ganon
+  * Multiworld Triforce counts are collective, so once the total is reached across all players everyone wins.
+  * If enabled via randomizing main rules, the count is always 20.
+
+#### Updated Settings 
+* Open Zora Fountain now has an open only adult option.
+
+#### Other Changed
+* Non-Always Location hints cannot be placed for an area that already has a Foolish hint.
+  * If the location hint is placed first, then it can still appear in a foolish hinted area, however in Tournament hint distribution the Foolish hints are placed first so that cannot happen.
+* Refactored Logic once again. It now uses helper json rules and rules and reference other rules.
+* Updated Compressor. The GUI progress bar is now granular. If for some reason, the rom won't fit into 32MB, then the compressor will increase the output size.
+* Cosmetic heart color setting now applies in the file select screen.
+* Ganondorf no longer hints at his Boss Key chest contents.
+* Further seed generation speed improvements.
+
+#### Bug Fixes
+* Minor stability fix in Plando
+* Fixed two chests in MQ Shadow Temple that had swapped names in plando and spoilers
+* Removed (unnecessarily) duplicated/overlapping hints.
+* Randomizing main rules now works correctly.
+* Removed a misleading random "trials" value from the non-randomized settings in the spoiler.
+
 
 ### 5.1
 

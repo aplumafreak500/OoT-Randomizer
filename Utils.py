@@ -1,3 +1,5 @@
+import io
+import json
 import os, os.path
 import subprocess
 import sys
@@ -50,6 +52,20 @@ def default_output_path(path):
     if not os.path.exists(path):
         os.mkdir(path)
     return path
+
+
+def read_json(file_path):
+    json_string = ""
+    with io.open(file_path, 'r') as file:
+        for line in file.readlines():
+            json_string += line.split('#')[0].replace('\n', ' ')
+    json_string = re.sub(' +', ' ', json_string)
+    try:
+        return json.loads(json_string)
+    except json.JSONDecodeError as error:
+        raise Exception("JSON parse error around text:\n" + \
+                        json_string[error.pos-35:error.pos+35] + "\n" + \
+                        "                                   ^^\n")
 
 
 def open_file(filename):
@@ -108,7 +124,7 @@ class VersionError(Exception):
 def check_version(checked_version):
     if compare_version(checked_version, __version__) < 0:
         try:
-            with urllib.request.urlopen('http://raw.githubusercontent.com/TestRunnerSRL/OoT-Randomizer/master/version.py') as versionurl:
+            with urllib.request.urlopen('http://raw.githubusercontent.com/Roman971/OoT-Randomizer/Dev-R/version.py') as versionurl:
                 version = versionurl.read()
                 version = re.search(".__version__ = '(.+)'", str(version)).group(1)
 

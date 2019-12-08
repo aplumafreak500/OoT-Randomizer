@@ -7,7 +7,7 @@ import random
 from functools import reduce
 
 from Fill import FillError
-from EntranceShuffle import EntranceShuffleError, change_connections, confirm_replacement, validate_worlds
+from EntranceShuffle import EntranceShuffleError, change_connections, confirm_replacement, validate_world, check_entrances_compatibility
 from Hints import gossipLocations, GossipText
 from Item import ItemFactory, ItemIterator, IsItem
 from ItemPool import item_groups, get_junk_item
@@ -165,10 +165,10 @@ class EntranceRecord(SimpleRecord({'region': None, 'origin': None})):
 
     @staticmethod
     def from_entrance(entrance):
-        if entrance.type in ['Overworld', 'OwlDrop']:
-            origin_name = entrance.replaces.parent_region.name
-        else:
+        if entrance.replaces.primary and entrance.replaces.type in ('Interior', 'SpecialInterior', 'Grotto', 'Grave'):
             origin_name = None
+        else:
+            origin_name = entrance.replaces.parent_region.name
         return EntranceRecord({
             'region': entrance.connected_region.name,
             'origin': origin_name,
@@ -400,9 +400,9 @@ class WorldDistribution(object):
                     removed_items = self.pool_remove_item([pool], item_name, -add_count)
                     for item in removed_items:
                         if bottle_matcher(item):
-                            self.pool_add_item([pool], "#Bottle", 1)
+                            self.pool_add_item(pool, "#Bottle", 1)
                         elif trade_matcher(item):
-                            self.pool_add_item([pool], "#AdultTrade", 1)
+                            self.pool_add_item(pool, "#AdultTrade", 1)
 
         junk_to_add = pool_size - len(pool)
         if junk_to_add > 0:
@@ -411,6 +411,17 @@ class WorldDistribution(object):
             junk_items = self.pool_remove_item([pool], "#Junk", -junk_to_add)
 
         return pool
+
+
+    def set_complete_itempool(self, pool):
+        self.item_pool = {}
+        for item in pool:
+            if item.dungeonitem or item.type in ('Drop', 'Event', 'DungeonReward'):
+                continue
+            if item.name in self.item_pool:
+                self.item_pool[item.name].count += 1
+            else:
+                self.item_pool[item.name] = ItemPoolRecord()
 
 
     def collect_starters(self, state):
@@ -452,7 +463,7 @@ class WorldDistribution(object):
                     raise RuntimeError('No entrance found to replace with %s that leads to %s in world %d' % 
                                                 (matched_entrance, target_region, self.id + 1))
 
-                if matched_entrance.type in ['Overworld', 'OwlDrop']:
+                if record.origin:
                     target_parent = record.origin
                     try:
                         matched_target = next(filter(lambda target: target.replaces.parent_region.name == target_parent, matched_targets_to_region))
@@ -467,13 +478,13 @@ class WorldDistribution(object):
                     raise RuntimeError('Entrance leading to %s from %s is already shuffled in world %d' % 
                                             (target_region, target_parent, self.id + 1))
 
-                change_connections(matched_entrance, matched_target)
-
                 try:
-                    validate_worlds(worlds, None, locations_to_ensure_reachable, itempool)
+                    check_entrances_compatibility(matched_entrance, matched_target)
+                    change_connections(matched_entrance, matched_target)
+                    validate_world(matched_entrance.world, worlds, None, locations_to_ensure_reachable, itempool)
                 except EntranceShuffleError as error:
                     raise RuntimeError('Cannot connect %s To %s in world %d (Reason: %s)' % 
-                                            (matched_entrance, matched_entrance.connected_region, self.id + 1, error))
+                                            (matched_entrance, matched_entrance.connected_region or matched_target.connected_region, self.id + 1, error))
 
                 confirm_replacement(matched_entrance, matched_target)
 
@@ -643,6 +654,23 @@ class Distribution(object):
             world_dist.cloak(worlds, location_pools, model_pools)
 
 
+    def configure_triforce_hunt(self, worlds):
+        total_count = 0
+        total_starting_count = 0
+        for world in worlds:
+            world.triforce_count = world.distribution.item_pool['Triforce Piece'].count
+            if 'Triforce Piece' in world.distribution.starting_items:
+                world.triforce_count += world.distribution.starting_items['Triforce Piece'].count
+                total_starting_count += world.distribution.starting_items['Triforce Piece'].count
+            total_count += world.triforce_count
+
+        if total_count < worlds[0].triforce_goal:
+            raise RuntimeError('Not enough Triforce Pieces in the worlds. There should be at least %d and there are only %d.' % (worlds[0].triforce_goal, total_count))
+
+        if total_starting_count >= worlds[0].triforce_goal:
+            raise RuntimeError('Too many Triforce Pieces in starting items. There should be at most %d and there are %d.' % (worlds[0].triforce_goal - 1, total_starting_count))
+
+
     def update(self, src_dict, update_all=False):
         update_dict = {
             'file_hash': (src_dict.get('file_hash', []) + [None, None, None, None, None])[0:5],
@@ -744,17 +772,6 @@ class Distribution(object):
             world_dist.woth_locations = {loc.name: LocationRecord.from_item(loc.item) for loc in spoiler.required_locations[world.id]}
             world_dist.barren_regions = [*world.empty_areas]
             world_dist.gossip_stones = {gossipLocations[loc].name: GossipRecord(spoiler.hints[world.id][loc].to_json()) for loc in spoiler.hints[world.id]}
-            world_dist.item_pool = {}
-
-        for world in spoiler.worlds:
-            for (_, item) in spoiler.locations[world.id].items():
-                if item.dungeonitem or item.type in ('Drop', 'Event', 'DungeonReward'):
-                    continue
-                player_dist = item.world.distribution
-                if item.name in player_dist.item_pool:
-                    player_dist.item_pool[item.name].count += 1
-                else:
-                    player_dist.item_pool[item.name] = ItemPoolRecord()
 
         self.playthrough = {}
         for (sphere_nr, sphere) in spoiler.playthrough.items():

@@ -1,4 +1,5 @@
 {
+"seed": "TESTTESTTEST",
 "cosmetics_only": false,
 "count": 1,
 "world_count": 1,
@@ -9,7 +10,7 @@
 "randomize_settings": false,
 "open_forest": "open",
 "open_door_of_time": true,
-"open_fountain": false,
+"zora_fountain": "closed",
 "gerudo_fortress": "fast",
 "bridge": "dungeons",
 "logic_rules": "glitchless",

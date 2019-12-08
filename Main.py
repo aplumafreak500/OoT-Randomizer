@@ -133,6 +133,9 @@ def generate(settings, window):
         set_drop_location_names(world)
         world.fill_bosses()
 
+    if settings.triforce_hunt:
+        settings.distribution.configure_triforce_hunt(worlds)
+
     logger.info('Setting Entrances.')
     set_entrances(worlds)
 
@@ -509,7 +512,7 @@ def create_playthrough(spoiler):
 
     playthrough = RewindablePlaythrough([world.state for world in worlds])
     # Get all item locations in the worlds
-    item_locations = [location for state in playthrough.state_list for location in state.world.get_filled_locations() if location.item.advancement]
+    item_locations = playthrough.progression_locations()
     # Omit certain items from the playthrough
     internal_locations = {location for location in item_locations if location.internal}
     # Generate a list of spheres by iterating over reachable locations without collecting as we go.
@@ -618,5 +621,5 @@ def create_playthrough(spoiler):
     # Then we can finally output our playthrough
     spoiler.playthrough = OrderedDict((str(i + 1), {location: location.item for location in sphere}) for i, sphere in enumerate(collection_spheres))
 
-    if worlds[0].entrance_shuffle != 'off':
+    if worlds[0].entrance_shuffle:
         spoiler.entrance_playthrough = OrderedDict((str(i + 1), list(sphere)) for i, sphere in enumerate(entrance_spheres))

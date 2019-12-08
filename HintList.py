@@ -77,6 +77,7 @@ conditional_always = {
 # @ will print the player name
 # # sets color to white (currently only used for dungeon reward hints).
 hintTable = {
+    'Triforce Piece':                                           (["a triumph fork", "cheese", "a gold fragment"], "a Piece of the Triforce", "item"),
     'Magic Meter':                                              (["mystic training", "pixie dust", "a green rectangle"], "a Magic Meter", 'item'),
     'Double Defense':                                           (["a white outline", "damage decrease", "strengthened love"], "Double Defense", 'item'),
     'Slingshot':                                                (["a seed shooter", "a rubberband", "a child's catapult"], "a Slingshot", 'item'),
@@ -260,8 +261,8 @@ hintTable = {
     'Shadow Temple MQ Bomb Flower Chest':                       (["shadows in an #invisible maze# guard", "after a free #boat ride# comes"], None, ['dungeon', 'sometimes']),
 
     'Desert Colossus -> Desert Colossus Grotto':                ("lifting a rock in #the desert# reveals", None, 'entrance'),
-    'Gerudo Valley -> Gerudo Valley Octorok Grotto':            ("on #a ledge in the valley#, a silver rock hides", None, 'entrance'),
-    'Goron City -> Goron City Grotto':                          ("a #pool of lava# in Goron City blocks the way to", None, 'entrance'),
+    'Gerudo Valley Grotto Ledge -> Gerudo Valley Octorok Grotto':("on #a ledge in the valley#, a silver rock hides", None, 'entrance'),
+    'Goron City Grotto Platform -> Goron City Grotto':          ("a #pool of lava# in Goron City blocks the way to", None, 'entrance'),
     'Gerudo Fortress -> Gerudo Fortress Storms Grotto':         ("a #storm within Gerudo's Fortress# reveals", None, 'entrance'),
     'Zoras Domain -> Zoras Domain Storms Grotto':               ("a #storm within Zora's Domain# reveals", None, 'entrance'),
     'Hyrule Castle Grounds -> Castle Storms Grotto':            ("a #storm near the castle# reveals", None, 'entrance'),
@@ -272,9 +273,9 @@ hintTable = {
     'Gerudo Valley Far Side -> Carpenter Tent':                 ("a #tent in the valley# covers", None, 'entrance'),
     'Shadow Temple Warp Region -> Shadow Temple Entryway':      ("at the back of #the Graveyard#, there is", None, 'entrance'),
     'Lake Hylia -> Water Temple Lobby':                         ("deep #under a vast lake#, one can find", None, 'entrance'),
-    'Sacred Forest Meadow -> Forest Temple Lobby':              ("deep #within the Meadow#, one can find", None, 'entrance'),
+    'Forest Temple Entrance Ledge -> Forest Temple Lobby':      ("deep #within the Meadow#, one can find", None, 'entrance'),
     'Gerudo Fortress -> Gerudo Training Grounds Lobby':         ("#thieves# train within", None, 'entrance'),
-    'Zoras Fountain -> Ice Cavern Beginning':                   ("in #a frozen fountain#, an opening leads to", None, 'entrance'),
+    'Zoras Fountain Ice Ledge -> Ice Cavern Beginning':         ("in #a frozen fountain#, an opening leads to", None, 'entrance'),
     'Zoras Fountain -> Jabu Jabus Belly Beginning':             ("inside #Jabu Jabu#, one can find", None, 'entrance'),
 
     'Links House':                                              ("Link's House", None, 'region'),

@@ -1,21 +1,20 @@
-from State import State
-from Region import Region, TimeOfDay
+import copy
+import logging
+import random
+
+from DungeonList import create_dungeons
 from Entrance import Entrance
+from HintList import getRequiredHints
 from Hints import get_hint_area
+from Item import Item, ItemFactory, MakeEventItem
 from Location import Location, LocationFactory
 from LocationList import business_scrubs
-from DungeonList import create_dungeons
+from Region import Region, TimeOfDay
 from Rules import set_rules, set_shop_rules
-from Item import Item, ItemFactory, MakeEventItem
 from RuleParser import Rule_AST_Transformer
 from SettingsList import get_setting_info
-from HintList import getRequiredHints
-import logging
-import copy
-import io
-import json
-import random
-import re
+from State import State
+from Utils import read_json
 
 class World(object):
 
@@ -35,6 +34,7 @@ class World(object):
         self.scrub_prices = {}
         self.maximum_wallets = 0
         self.light_arrow_location = None
+        self.triforce_count = 0
 
         self.parser = Rule_AST_Transformer(self)
         self.event_items = set()
@@ -45,21 +45,24 @@ class World(object):
         self.__dict__.update(settings.__dict__)
         self.distribution = settings.distribution.world_dists[id]
 
-        if self.open_forest == 'closed' and self.entrance_shuffle in ['all-indoors', 'all']:
-            self.open_forest = 'closed_deku'
-
         # rename a few attributes...
         self.keysanity = self.shuffle_smallkeys in ['keysanity', 'remove']
         self.check_beatable_only = not self.all_reachable
-    
-        self.shuffle_dungeon_entrances = self.entrance_shuffle != 'off'
-        self.shuffle_grotto_entrances = self.entrance_shuffle in ['simple-indoors', 'all-indoors', 'all']
-        self.shuffle_interior_entrances = self.entrance_shuffle in ['simple-indoors', 'all-indoors', 'all']
-        self.shuffle_special_indoor_entrances = self.entrance_shuffle in ['all-indoors', 'all']
-        self.shuffle_overworld_entrances = self.entrance_shuffle == 'all'
 
-        self.disable_trade_revert = self.shuffle_interior_entrances or self.shuffle_overworld_entrances
+        self.shuffle_special_interior_entrances = self.shuffle_interior_entrances == 'all'
+        self.shuffle_interior_entrances = self.shuffle_interior_entrances in ['simple', 'all']
+
+        self.entrance_shuffle = self.shuffle_interior_entrances or self.shuffle_grotto_entrances or self.shuffle_dungeon_entrances or \
+                                self.shuffle_overworld_entrances or self.owl_drops or self.warp_songs or self.spawn_positions
+
         self.ensure_tod_access = self.shuffle_interior_entrances or self.shuffle_overworld_entrances
+        self.disable_trade_revert = self.shuffle_interior_entrances or self.shuffle_overworld_entrances or self.warp_songs
+
+        if self.open_forest == 'closed' and (self.shuffle_special_interior_entrances or self.shuffle_overworld_entrances or 
+                                             self.warp_songs or self.spawn_positions or self.decouple_entrances or self.mix_entrance_pools):
+            self.open_forest = 'closed_deku'
+
+        self.triforce_goal = self.triforce_goal_per_world * settings.world_count
 
         # Determine LACS Condition
         if self.shuffle_ganon_bosskey == 'lacs_medallions':
@@ -113,6 +116,8 @@ class World(object):
         new_world.starting_age = self.starting_age
         new_world.can_take_damage = self.can_take_damage
         new_world.shop_prices = copy.copy(self.shop_prices)
+        new_world.triforce_goal = self.triforce_goal
+        new_world.triforce_count = self.triforce_count
         new_world.maximum_wallets = self.maximum_wallets
         new_world.distribution = self.distribution
 
@@ -185,17 +190,7 @@ class World(object):
 
 
     def load_regions_from_json(self, file_path):
-        json_string = ""
-        with io.open(file_path, 'r') as file:
-            for line in file.readlines():
-                json_string += line.split('#')[0].replace('\n', ' ')
-        json_string = re.sub(' +', ' ', json_string)
-        try:
-            region_json = json.loads(json_string)
-        except json.JSONDecodeError as error:
-            raise Exception("JSON parse error around text:\n" + \
-                            json_string[error.pos-35:error.pos+35] + "\n" + \
-                            "                                   ^^\n")
+        region_json = read_json(file_path)
             
         for region in region_json:
             new_region = Region(region['region_name'])
@@ -470,19 +465,27 @@ class World(object):
 
 
     def get_unfilled_locations(self):
-        return [location for location in self.get_locations() if location.item is None]
+        return filter(Location.has_no_item, self.get_locations())
 
 
     def get_filled_locations(self):
-        return [location for location in self.get_locations() if location.item is not None]
+        return filter(Location.has_item, self.get_locations())
+
+
+    def get_progression_locations(self):
+        return filter(Location.has_progression_item, self.get_locations())
 
 
     def get_entrances(self):
-        return [entrance for region in self.regions for entrance in region.entrances]
+        return [exit for region in self.regions for exit in region.exits]
 
 
-    def get_shuffled_entrances(self, type=None):
-        return [entrance for entrance in self.get_entrances() if entrance.shuffled and (type == None or entrance.type == type)]
+    def get_shufflable_entrances(self, type=None, only_primary=False):
+        return [entrance for entrance in self.get_entrances() if (type == None or entrance.type == type) and (not only_primary or entrance.primary)]
+
+
+    def get_shuffled_entrances(self, type=None, only_primary=False):
+        return [entrance for entrance in self.get_shufflable_entrances(type=type, only_primary=only_primary) if entrance.shuffled]
 
 
     def has_beaten_game(self, state):
@@ -552,8 +555,8 @@ class World(object):
         if self.hints != 'agony':
             # Stone of Agony only required if it's used for hints
             exclude_item_list.append('Stone of Agony')
-        if not self.shuffle_special_indoor_entrances and not self.shuffle_overworld_entrances:
-            # Serenade and Prelude are never required with vanilla Links House/ToT and overworld entrances
+        if not self.shuffle_special_interior_entrances and not self.shuffle_overworld_entrances and not self.warp_songs and not self.spawn_positions:
+            # Serenade and Prelude are never required unless one of those settings is enabled
             exclude_item_list.append('Serenade of Water')
             exclude_item_list.append('Prelude of Light')
 

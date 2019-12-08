@@ -2,7 +2,9 @@ import argparse
 import re
 import math
 import json
-from Cosmetics import get_tunic_color_options, get_navi_color_options, get_sword_color_options, get_gauntlet_color_options, get_magic_color_options, get_heart_color_options
+from Cosmetics import get_tunic_color_options, get_navi_color_options, get_sword_color_options,\
+    get_gauntlet_color_options, get_magic_color_options, get_heart_color_options, get_a_button_color_options,\
+    get_b_button_color_options, get_c_button_color_options, get_start_button_color_options
 from Location import LocationIterator
 import Sounds as sfx
 from Utils import data_path
@@ -1285,8 +1287,8 @@ setting_infos = [
         default        = False,
         disable        = {
             True : {
-                'sections' : ['open_section', 'shuffle_section', 'shuffle_dungeon_section'],
-                'settings' : ['starting_age', 'entrance_shuffle', 'bombchus_in_logic', 'one_item_per_dungeon'],
+                'sections' : ['various_section', 'shuffle_section', 'shuffle_dungeon_section'],
+                'settings': ['starting_age', 'shuffle_interior_entrances', 'shuffle_grotto_entrances', 'shuffle_dungeon_entrances', 'shuffle_overworld_entrances', 'mix_entrance_pools', 'decouple_entrances', 'owl_drops', 'warp_songs', 'spawn_positions'],
             }
         },
         shared         = True,
@@ -1329,6 +1331,22 @@ setting_infos = [
         },
     ),
     Checkbutton(
+        name           = 'open_kakariko',
+        gui_text       = 'Open Kakariko Gate',
+        gui_tooltip    = '''\
+            The gate in Kakariko Village to Death Mountain Trail
+            is always open instead of needing Zelda's Letter.
+            The Happy Mask shop opens upon obtaining Zelda's
+            Letter without requiring showing it to the guard.
+
+            Either way, the gate is always open as an adult.
+        ''',
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
+        },
+    ),
+    Checkbutton(
         name           = 'open_door_of_time',
         gui_text       = 'Open Door of Time',
         gui_tooltip    = '''\
@@ -1342,12 +1360,27 @@ setting_infos = [
             'randomize_key': 'randomize_settings',
         },
     ),
-    Checkbutton(
-        name           = 'open_fountain',
-        gui_text       = 'Open Zora\'s Fountain',
+    Combobox(
+        name           = 'zora_fountain',
+        gui_text       = 'Zora\'s Fountain',
+        default        = 'closed',
+        choices        = {
+            'closed': 'Default Behavior (Closed)',
+            'adult':  'Open For Adult',
+            'open':   'Always Open',
+        },
         gui_tooltip    = '''\
-            King Zora starts out as moved. This also removes
-            Ruto's Letter from the item pool.
+            'Default Behavior': King Zora obstructs the way to
+            Zora's Fountain. Ruto's Letter must be shown as
+            child in order to move him for both eras.
+
+            'Open For Adult': King Zora is always moved in 
+            the adult era. This means Ruto's Letter is only
+            required to access Zora's Fountain as child.
+
+            'Always Open': King Zora starts as moved in
+            both the child and adult eras. This also removes 
+            Ruto's Letter from the pool since it can't be used.
         ''',
         shared         = True,
         gui_params     = {
@@ -1431,6 +1464,50 @@ setting_infos = [
             "hide_when_disabled": True,
         },
     ),
+    Checkbutton(
+        name           = 'triforce_hunt',
+        gui_text       = 'Triforce Hunt',
+        gui_tooltip    = '''\
+            Pieces of the Triforce have been scattered around the world. 
+            Find some of them to beat the game.
+
+            Game is saved on completion, and Ganon's Castle key is given
+            if beating the game again is desired.
+        ''',
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
+        },
+        disable        = {
+            True  : {'settings' : ['shuffle_ganon_bosskey']},
+            False : {'settings' : ['triforce_goal_per_world']}
+        },
+    ),    
+    Scale(
+        name           = 'triforce_goal_per_world',
+        gui_text       = 'Required Triforces Per World',
+        default        = 20,
+        min            = 1,
+        max            = 100,
+        shared         = True,
+        gui_tooltip    = '''\
+            Select the amount of Triforce Pieces required to beat the game.
+
+            In multiworld, each world will have the same number of triforces 
+            in them. The required ammount will be per world collectively. 
+            For example, if this is set to 20 in a 2 player multiworld, players 
+            need 40 total, but one player could obtain 30 and the other 10. 
+
+            Extra pieces are determined by the the Item Pool setting:
+            'Plentiful': 100% Extra
+            'Balanced': 50% Extra
+            'Scarce': 25% Extra
+            'Minimal: No Extra
+        ''',
+        gui_params     = {
+            "hide_when_disabled": True,
+        },
+    ),
     Combobox(
         name           = 'logic_rules',
         gui_text       = 'Logic Rules',
@@ -1453,7 +1530,7 @@ setting_infos = [
             May not be beatable.
         ''',
         disable        = {
-            'glitched'  : {'settings' : ['entrance_shuffle', 'mq_dungeons_random', 'mq_dungeons']},
+            'glitched'  : {'settings' : ['mq_dungeons_random', 'mq_dungeons', 'shuffle_interior_entrances', 'shuffle_grotto_entrances', 'shuffle_dungeon_entrances', 'shuffle_overworld_entrances', 'mix_entrance_pools', 'decouple_entrances', 'owl_drops', 'warp_songs', 'spawn_positions']},
             'none'      : {'tabs'     : ['detailed_tab']},
         },
         shared         = True,
@@ -1476,19 +1553,21 @@ setting_infos = [
         name           = 'bombchus_in_logic',
         gui_text       = 'Bombchus Are Considered in Logic',
         gui_tooltip    = '''\
-            Bombchus are properly considered in logic.
+            Bombchus are properly considered in logic and
+            the game is changed to account for this fact.
 
             The first Bombchu pack will always be 20.
             Subsequent packs will be 5 or 10 based on
             how many you have.
 
-            Bombchus can be purchased for 60/99/180
-            rupees once they have been found.
+            Bombchus are no longer tied to the Bomb Bag.
+            Once Bombchus have been found, they can be 
+            purchased for 60/99/180 rupees and Bombchu
+            drops can be collected around the world.
 
             Bombchu Bowling opens with Bombchus.
-            Bombchus are available at Kokiri Shop
-            and the Bazaar. Bombchu refills cannot
-            be bought until Bombchus have been obtained.
+            Additional Bombchu refills are available at 
+            the Kokiri Shop and the Bazaar.
         ''',
         default        = False,
         shared         = True,
@@ -1550,9 +1629,6 @@ setting_infos = [
         ''',
         shared         = True,
         disabled_default = 0,
-        gui_params     = {
-            'randomize_key': 'randomize_settings',
-        },
     ),
     Checkbutton(
         name           = 'no_escape_sequence',
@@ -1832,52 +1908,156 @@ setting_infos = [
         },
     ),
     Combobox(
-        name           = 'entrance_shuffle',
-        gui_text       = 'Entrance Shuffle',
+        name           = 'shuffle_interior_entrances',
+        gui_text       = 'Shuffle Interior Entrances',
         default        = 'off',
         choices        = {
-            'off':              'Off',
-            'dungeons':         'Dungeons Only',
-            'simple-indoors':   'Simple Indoors',
-            'all-indoors':      'All Indoors',
-            'all':              'All Indoors & Overworld',
+            'off':       'Off',
+            'simple':    'Simple Interiors',
+            'all':       'All Interiors',
         },
         gui_tooltip    = '''\
-            Shuffle entrances bidirectionally within different pools.
+            'Simple Interiors': 
+            Shuffle the pool of interior entrances which contains most Houses 
+            and all Great Fairies.
+    
+            'All Interiors':
+            Extended version of 'Simple Interiors' with some extra places:
+            Windmill, Link's House, Temple of Time and Kakariko Potion Shop.
 
-            'Dungeons Only':
-            Shuffle dungeon entrances with each other, including Bottom 
-            of the Well, Ice Cavern, and Gerudo Training Grounds. 
-            However, Ganon's Castle is not shuffled.
-            Additionally, the entrances of Deku Tree, Fire Temple and 
-            Bottom of the Well are opened for both adult and child.
-
-            'Simple Indoors':
-            Shuffle dungeon entrances along with simple Grotto and
-            Interior entrances (i.e. most Houses and Great Fairies).
-
-            'All Indoors':
-            Extended version of 'Simple Indoors' with some extra entrances:
-            Adult Potion Shop, Windmill, Link's House, Temple of Time and
-            Dampe's Grave.
- 
-            'All Indoors & Overworld':
-            Same as 'All Indoors' but with Overworld loading zones shuffled
-            in a new separate pool. Owl drop positions are also randomized.
-
-            Note: If Interior or Overworld entrances are shuffled, trade timers 
-            are disabled and trade items never revert.
+            When shuffling any interior entrances, trade quest timers are disabled 
+            and items never revert, even when dying or loading a save.
         ''',
         shared         = True,
         gui_params     = {
             'randomize_key': 'randomize_settings',
             'distribution':  [
-                ('off', 4),
-                ('dungeons', 1),
-                ('simple-indoors', 1),
-                ('all-indoors', 1),
+                ('off', 2),
+                ('simple', 1),
                 ('all', 1),
             ],
+        },
+    ),
+    Checkbutton(
+        name           = 'shuffle_grotto_entrances',
+        gui_text       = 'Shuffle Grotto Entrances',
+        gui_tooltip    = '''\
+            Shuffle the pool of grotto entrances, including all graves, 
+            small Fairy Fountains and the Lost Woods Stage.
+        ''',
+        default        = False,
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
+        },
+    ),
+    Checkbutton(
+        name           = 'shuffle_dungeon_entrances',
+        gui_text       = 'Shuffle Dungeon Entrances',
+        gui_tooltip    = '''\
+            Shuffle the pool of dungeon entrances, including Bottom 
+            of the Well, Ice Cavern, and Gerudo Training Grounds.
+            However, Ganon's Castle is not shuffled.
+
+            Additionally, the entrances of Deku Tree, Fire Temple and 
+            Bottom of the Well are opened for both adult and child.
+        ''',
+        default        = False,
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
+        },
+    ),
+    Checkbutton(
+        name           = 'shuffle_overworld_entrances',
+        gui_text       = 'Shuffle Overworld Entrances',
+        gui_tooltip    = '''\
+            Shuffle the pool of Overworld entrances, which corresponds
+            to almost all loading zones between Overworld areas.
+
+            Some entrances are kept vanilla to avoid issues:
+            - Hyrule Castle Courtyard and Garden entrances
+            - Gerudo Valley to Lake Hylia by the stream
+            - Both Market Back Alley entrances
+
+            Just like when shuffling interior entrances, shuffling overworld 
+            entrances disables trade timers and trade items never revert, 
+            even when dying or loading a save.
+        ''',
+        default        = False,
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
+        },
+    ), 
+    Checkbutton(
+        name           = 'mix_entrance_pools',
+        gui_text       = 'Mix Entrance Pools',
+        gui_tooltip    = '''\
+            Shuffle all entrances into a single mixed pool.
+            This means any shuffled entrance could lead to any type 
+            of area: Dungeon, Grotto, Interior or Overworld.
+        ''',
+        default        = False,
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
+        },
+    ),
+    Checkbutton(
+        name           = 'decouple_entrances',
+        gui_text       = 'Decouple Entrances',
+        gui_tooltip    = '''\
+            Decouple entrances when shuffling them.
+            This means you are no longer guaranteed to end up back where 
+            you came from when you go back through an entrance.
+        ''',
+        default        = False,
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
+        },
+    ),
+    Checkbutton(
+        name           = 'owl_drops',
+        gui_text       = 'Randomize Owl Drops',
+        gui_tooltip    = '''\
+            Randomize where Kaepora Gaebora (the Owl) drops you at 
+            when you talk to him at Lake Hylia or at the top of 
+            Death Mountain Trail.
+        ''',
+        default        = False,
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
+        },
+    ),
+    Checkbutton(
+        name           = 'warp_songs',
+        gui_text       = 'Randomize Warp Song Destinations',
+        gui_tooltip    = '''\
+            Randomize where each of the 6 warp songs leads to.
+        ''',
+        default        = False,
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
+        },
+    ),
+    Checkbutton(
+        name           = 'spawn_positions',
+        gui_text       = 'Randomize Overworld Spawns',
+        gui_tooltip    = '''\
+            Randomize where you start as Child or Adult when loading
+            a save in the Overworld. This means you may not necessarily
+            spawn inside Link's House or Temple of Time.
+
+            This stays consistent after saving and loading the game again.
+        ''',
+        default        = False,
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
         },
     ),
     Combobox(
@@ -2114,6 +2294,7 @@ setting_infos = [
         name           = 'shuffle_ganon_bosskey',
         gui_text       = 'Ganon\'s Boss Key',
         default        = 'dungeon',
+        disabled_default = 'triforce',
         choices        = {
             'remove':          "Remove (Keysy)",
             'vanilla':         "Vanilla Location",
@@ -2145,7 +2326,6 @@ setting_infos = [
             'On LACS: Medallions': All 6 Medallions.
             'On LACS: Stones': All 3 Spiritual Stones.
             'On LACS: Dungeons': All Spiritual Stones & Medallions.
-            
         ''',
         shared         = True,
         gui_params     = {
@@ -2500,24 +2680,22 @@ setting_infos = [
         gui_text       = 'Starting Time of Day',
         default        = 'default',
         choices        = {
-            'default':       'Default',
+            'default':       'Default (10:00)',
             'random':        'Random Choice',
-            'sunrise':       'Sunrise',
-            'morning':       'Morning',
-            'noon':          'Noon',
-            'afternoon':     'Afternoon',
-            'sunset':        'Sunset',
-            'evening':       'Evening',
-            'midnight':      'Midnight',
-            'witching-hour': 'Witching Hour',
+            'sunrise':       'Sunrise (6:30)',
+            'morning':       'Morning (9:00)',
+            'noon':          'Noon (12:00)',
+            'afternoon':     'Afternoon (15:00)',
+            'sunset':        'Sunset (18:00)',
+            'evening':       'Evening (21:00)',
+            'midnight':      'Midnight (00:00)',
+            'witching-hour': 'Witching Hour (03:00)',
         },
         gui_tooltip    = '''\
             Change up Link's sleep routine.
 
             Daytime officially starts at 6:30,
             nighttime at 18:00 (6:00 PM).
-
-            Default is 10:00 in the morning.
         ''',
         shared         = True,
     ),
@@ -2631,6 +2809,18 @@ setting_infos = [
         default        = True,
     ),
     Checkbutton(
+        name           = 'correct_model_colors',
+        gui_text       = 'Item Model Colors Match Cosmetics',
+        gui_tooltip    = '''\
+            Ingame models for items such as Heart Containers have 
+            colors matching the colors chosen for cosmetic settings.
+
+            Tunic colors are excluded from this to prevent not being 
+            able to discern freestanding Tunics from each other.
+        ''',
+        default        = False,
+    ),
+    Checkbutton(
         name           = 'randomize_all_cosmetics',
         gui_text       = 'Randomize All Cosmetics',
         gui_tooltip    = '''\
@@ -2641,7 +2831,6 @@ setting_infos = [
             True : {'sections' : [ "equipment_section", "ui_section", "navi_section" ]
             }
         }
-
     ),
     Setting_Info(
         name           = 'kokiri_color',
@@ -3046,6 +3235,94 @@ setting_infos = [
         }
 
     ),
+    Setting_Info(
+        name           = 'a_button_color',
+        type           = str,
+        gui_text       = 'A Button Color',
+        gui_type       = "Combobox",
+        shared         = False,
+        choices        = get_a_button_color_options(),
+        default        = 'N64 Blue',
+        gui_tooltip    = '''\
+            'Random Choice': Choose a random
+            color from this list of colors.
+            'Completely Random': Choose a random
+            color from any color the N64 can draw.
+        ''',
+        gui_params     = {
+            'randomize_key': 'randomize_all_cosmetics',
+            'distribution': [
+                ('Completely Random', 1),
+            ]
+        }
+
+    ),
+    Setting_Info(
+        name           = 'b_button_color',
+        type           = str,
+        gui_text       = 'B Button Color',
+        gui_type       = "Combobox",
+        shared         = False,
+        choices        = get_b_button_color_options(),
+        default        = 'N64 Green',
+        gui_tooltip    = '''\
+            'Random Choice': Choose a random
+            color from this list of colors.
+            'Completely Random': Choose a random
+            color from any color the N64 can draw.
+        ''',
+        gui_params     = {
+            'randomize_key': 'randomize_all_cosmetics',
+            'distribution': [
+                ('Completely Random', 1),
+            ]
+        }
+
+    ),
+    Setting_Info(
+        name           = 'c_button_color',
+        type           = str,
+        gui_text       = 'C Button Color',
+        gui_type       = "Combobox",
+        shared         = False,
+        choices        = get_c_button_color_options(),
+        default        = 'Default Yellow',
+        gui_tooltip    = '''\
+            'Random Choice': Choose a random
+            color from this list of colors.
+            'Completely Random': Choose a random
+            color from any color the N64 can draw.
+        ''',
+        gui_params     = {
+            'randomize_key': 'randomize_all_cosmetics',
+            'distribution': [
+                ('Completely Random', 1),
+            ]
+        }
+
+    ),
+    Setting_Info(
+        name           = 'start_button_color',
+        type           = str,
+        gui_text       = 'Start Button Color',
+        gui_type       = "Combobox",
+        shared         = False,
+        choices        = get_start_button_color_options(),
+        default        = 'N64 Red',
+        gui_tooltip    = '''\
+            'Random Choice': Choose a random
+            color from this list of colors.
+            'Completely Random': Choose a random
+            color from any color the N64 can draw.
+        ''',
+        gui_params     = {
+            'randomize_key': 'randomize_all_cosmetics',
+            'distribution': [
+                ('Completely Random', 1),
+            ]
+        }
+
+    ),
     Checkbutton(
         name           = 'randomize_all_sfx',
         gui_text       = 'Randomize All Sound Effects',
@@ -3240,7 +3517,7 @@ for info in setting_infos:
         for option, disabling in info.disable.items():
             for setting in disabling.get('settings', []):
                 create_dependency(setting, info, option)
-            for section in disabling.get('setions', []):
+            for section in disabling.get('sections', []):
                 for setting in get_settings_from_section(section):
                     create_dependency(setting, info, option)
             for tab in disabling.get('tabs', []):

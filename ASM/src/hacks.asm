@@ -152,6 +152,7 @@
     addiu   at, r0, 0x8383 ; Make branch impossible
 
 ; Change Skulltula Token to give a different item
+; Mutated by Patches.py
 ; Replaces
 ;    move    a0, s1
 ;    jal     0x0006FDCC        ; call ex_06fdcc(ctx, 0x0071); VROM: 0xAE5D2C
@@ -162,7 +163,7 @@
 ;    li      a1, 0xB4          ; a1 = 0x00b4 ("You destoryed a Gold Skulltula...")
 ;    move    a2, zero
 ;    jal     0x000DCE14        ; call ex_0dce14(ctx, 0x00b4, 0)
-;    sh      t4, 0x110 (t5)    ; *(t5 + 0x110) = 0x000a
+;    sh      t4, 0x110 (t5)    ; *(t5 + 0x110) = 0x000a (Freeze the player actor for 10 frames)
 .orga 0xEC68BC
 .area 0x28, 0
     lw      t5, 0x2C (sp)                ; original code
@@ -917,6 +918,40 @@ skip_GS_BGS_text:
     nop
     nop
 
+; Replaces: lbu     t7, 0x0002(a1)
+;           addiu   v1, zero, 0x00FF
+;           addu    t8, v0, t7
+;           lbu     t9, 0x0074(t8)
+;           beq     v1, t9, 0x80013640
+.orga 0xA89518
+    sw      ra, 0(sp)
+    jal     bomb_drop_convert
+    nop
+    lw      ra, 0(sp)
+    beqz    v1, @drop_nothing
+
+.orga 0xA895A0
+@drop_nothing:
+
+;==================================================================================================
+; Override Collectible 05 to be a Bombchus (5) drop instead of the unused Arrow (1) drop
+;==================================================================================================
+; Replaces: 0x80011D30
+.orga 0xB7BD24
+    .word 0x80011D88
+
+; Replaces: li   a1, 0x03
+.orga 0xA8801C
+    li      a1, 0x96 ; Give Item Bombchus (5)
+.orga 0xA88CCC
+    li      a1, 0x96 ; Give Item Bombchus (5)
+
+; Replaces: lui     t5, 0x8012
+;           lui     at, 0x00FF
+.orga 0xA89268
+    jal     chu_drop_draw
+    lui     t5, 0x8012
+
 ;==================================================================================================
 ; Rainbow Bridge
 ;==================================================================================================
@@ -1061,6 +1096,37 @@ skip_GS_BGS_text:
 ; Replaces: bnezl t7, 0xAD1988 ; 0x8005BA28
 .orga 0xAD193C ; 0x8005B9DC
     b . + 0x4C
+
+
+;==================================================================================================
+; Extended Objects Table 
+;==================================================================================================
+
+; extends object table lookup for on chest open
+.org 0xBD6958
+    jal extended_object_lookup_GI
+    nop
+
+; extends object table lookup for on scene loads
+.org 0xAF76B8
+    sw      ra, 0x0C (sp)
+    jal extended_object_lookup_load
+    subu    t7, r0, a2
+    lw      ra, 0x0C (sp)
+
+; extends object table lookup for shop item load
+.org 0xAF74F8
+    sw      ra, 0x44 (sp)
+    jal extended_object_lookup_shop
+    nop
+    lw      ra, 0x44 (sp)
+
+; extends object table lookup for shop item load after you unpause
+.org 0xAF7650
+    sw      ra, 0x34 (sp)
+    jal extended_object_lookup_shop_unpause
+    nop
+    lw      ra, 0x34 (sp)
 
 ;==================================================================================================
 ; Cow Shuffle
@@ -1262,11 +1328,70 @@ skip_GS_BGS_text:
     jal     grotto_entrance
     lui     at, 1
 
-; Replaces: addu    at, at, a3
+; Replaces: lui     at, 0x0001
+;           addu    at, at, a3
 ;           sh      t6, 0x1E1A(at)
-.orga 0xBD4C58
+;           lh      v0, 0x1E1A(v1)
+;           addiu   at, zero, 0x7FFF
+;           addiu   t7, zero, 0x0002
+.orga 0xBD4C54
+    lui     at, 0x0001
     jal     scene_exit_hook
     addu    at, at, a3
+    bnez    v0, @skip_other_entrance_routines
+    addiu   at, zero, 0x7FFF
+    lh      v0, 0x1E1A(v1)
+
+.orga 0xBD4D4C
+@skip_other_entrance_routines:
+
+; Replaces: lui     v1, 0x8012
+;           lw      v1, -0x5A28(v1)
+.orga 0xB11000
+    jal     override_special_grotto_entrances_1
+    lui     v1, 0x8012
+
+; Replaces: sw      t4, 0x000C(s0)
+;           sw      t5, 0x0010(s0)
+.orga 0xB113D0
+    jal     override_special_grotto_entrances_2
+    sw      t4, 0x000C(s0)
+
+; Replaces: sw      v0, 0x000C(s0)
+;           sw      t9, 0x0010(s0)
+.orga 0xB11608
+    jal     override_special_grotto_entrances_3
+    sw      v0, 0x000C(s0)
+
+; Replaces: sw      t3, 0x0010(s0)
+;           sw      v0, 0x000C(s0)
+.orga 0xB117F4
+    jal     override_special_grotto_entrances_4
+    sw      t3, 0x0010(s0)
+
+; Replaces: sw      t3, 0x0010(s0)
+;           sw      v0, 0x000C(s0)
+.orga 0xB11984
+    jal     override_special_grotto_entrances_4
+    sw      t3, 0x0010(s0)
+
+; Replaces: lui     v0, 0x8012
+;           addiu   v0, v0, 0xA5D0
+;           lw      t6, 0x0010(v0)
+;           lui     t0, 0x8010
+;           beql    t6, zero, 0xAF869C
+;           lw      t8, 0x0004(v0)
+;           lw      t7, 0x0004(v0)
+;           lui     v0, 0x0001
+.orga 0xAF863C
+    addiu   sp, sp, -0x18
+    sw      ra, 0x04(sp)
+    jal     override_special_grotto_entrances_5
+    nop
+    lw      ra, 0x04(sp)
+    addiu   sp, sp, 0x18
+    beq     t6, zero, 0xAF869C
+    lui     v0, 0x0001
 
 ;==================================================================================================
 ; Getting Caught by Gerudo NPCs in ER
@@ -1422,7 +1547,6 @@ skip_GS_BGS_text:
     li      t6, 0x18
     lw      t7, 0x00A0(a2)
 
-
 ;==================================================================================================
 ; HUD Rupee Icon color
 ;==================================================================================================
@@ -1439,7 +1563,6 @@ skip_GS_BGS_text:
     sw      t9, 0x0000(s1)
     lhu     t4, 0x0252(s7)
     move    at, v0
-    
 
 ;==================================================================================================
 ; Expand Audio Thread memory
@@ -1480,3 +1603,42 @@ skip_GS_BGS_text:
 .endarea
 
 .headersize 0
+
+;==================================================================================================
+; King Zora Init Moved Check Override
+;==================================================================================================
+; Replaces: lhu     t0, 0x0EDA(v0)
+;           or      a0, s0, zero
+;           andi    t1, t0, 0x0008
+.orga 0xE565D0
+    jal     kz_moved_check
+    nop
+    or      a0, s0, zero
+
+; ==================================================================================================
+; HUD Button Colors
+; ==================================================================================================
+; Fix HUD Start Button to allow a value other than 00 for the blue intensity
+; Replaces: andi    t6, t7, 0x00FF
+.orga 0xAE9ED8
+    ori     t6, t7, 0x0000 ; add blue intensity to the start button color (Value Mutated in Cosmetics.py)
+
+; Handle Dynamic Shop Cursor Colors
+.orga 0xC6FF30
+.area 0x4C, 0
+    mul.s   f16, f10, f0
+    mfc1    a1, f8          ; color delta 1 (for extreme colors)
+    trunc.w.s f18, f16
+    mfc1    a2, f18         ; color delta 2 (for general colors)
+    swc1    f0, 0x023C(a0)  ; displaced code
+
+    addiu   sp, sp, -0x18
+    sw      ra, 0x04(sp)
+    jal     shop_cursor_colors
+    nop
+    lw      ra, 0x04(sp)
+    addiu   sp, sp, 0x18
+
+    jr      ra
+    nop
+.endarea

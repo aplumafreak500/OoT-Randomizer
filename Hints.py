@@ -99,13 +99,6 @@ def isRestrictedDungeonItem(dungeon, item):
     return False
 
 
-def stone_reachability(stone_name, stone_location):
-    # just name the event item after the gossip stone directly
-    MakeEventItem(stone_name, stone_location)
-
-    return lambda state, **kwargs: state.has(stone_name)
-
-
 def add_hint(spoiler, world, IDs, gossip_text, count, location=None, force_reachable=False):
     random.shuffle(IDs)
     skipped_ids = []
@@ -120,9 +113,11 @@ def add_hint(spoiler, world, IDs, gossip_text, count, location=None, force_reach
                 stone_location = world.get_location(stone_name)
                 if not first or can_reach_stone(spoiler.worlds, stone_location, location):
                     if first and location:
+                        # just name the event item after the gossip stone directly
+                        MakeEventItem(stone_name, stone_location)
                         # This mostly guarantees that we don't lock the player out of an item hint
                         # by establishing a (hint -> item) -> hint -> item -> (first hint) loop
-                        location.add_rule(stone_reachability(stone_name, stone_location))
+                        location.add_rule(world.parser.parse_rule(repr(stone_name)))
 
                     count -= 1
                     first = False
@@ -225,19 +220,25 @@ def colorText(gossip_text):
     return text
 
 
+# Peforms a breadth first search to find the closest hint area from a given spot (location or entrance)
+# May fail to find a hint if the given spot is only accessible from the root and not from any other region with a hint area
 def get_hint_area(spot):
-    if spot.parent_region.dungeon:
-        return spot.parent_region.dungeon.hint
-    elif spot.parent_region.hint:
-        return spot.parent_region.hint
-    #Breadth first search for connected regions with a max depth of 2
-    for entrance in spot.parent_region.entrances:
-        if entrance.parent_region.hint:
-            return entrance.parent_region.hint
-    for entrance in spot.parent_region.entrances:
-        for entrance2 in entrance.parent_region.entrances:
-            if entrance2.parent_region.hint:
-                return entrance2.parent_region.hint
+    already_checked = []
+    spot_queue = [spot]
+
+    while spot_queue:
+        current_spot = spot_queue.pop(0)
+        already_checked.append(current_spot)
+
+        parent_region = current_spot.parent_region
+    
+        if parent_region.dungeon:
+            return parent_region.dungeon.hint
+        elif parent_region.hint and (spot.parent_region.name == 'Root' or parent_region.name != 'Root'):
+            return parent_region.hint
+
+        spot_queue.extend(list(filter(lambda ent: ent not in already_checked, parent_region.entrances)))
+
     raise RuntimeError('No hint area could be found for %s [World %d]' % (spot, spot.world.id))
 
 
@@ -252,7 +253,7 @@ def get_woth_hint(spoiler, world, checked):
         return None
 
     location = random.choice(locations)
-    checked.append(location.name)
+    checked.add(location.name)
 
     if location.parent_region.dungeon:
         if world.hint_dist != 'very_strong':
@@ -261,7 +262,10 @@ def get_woth_hint(spoiler, world, checked):
     else:
         location_text = get_hint_area(location)
 
-    return (GossipText('#%s# is on the way of the hero.' % location_text, ['Light Blue']), location)
+    if world.triforce_hunt:
+        return (GossipText('#%s# is on the path of gold.' % location_text, ['Light Blue']), location)
+    else:
+        return (GossipText('#%s# is on the way of the hero.' % location_text, ['Light Blue']), location)
 
 
 def get_barren_hint(spoiler, world, checked):
@@ -279,21 +283,25 @@ def get_barren_hint(spoiler, world, checked):
     if world.hint_dist != 'very_strong' and world.empty_areas[area]['dungeon']:
         world.barren_dungeon = True
 
-    checked.append(area)
+    checked.add(area)
 
     return (GossipText("plundering #%s# is a foolish choice." % area, ['Pink']), None)
 
 
+def is_not_checked(location, checked):
+    return not (location.name in checked or get_hint_area(location) in checked)
+
+
 def get_good_item_hint(spoiler, world, checked):
     locations = [location for location in world.get_filled_locations()
-            if not location.name in checked and \
+            if is_not_checked(location, checked) and \
             location.item.majoritem and \
             not location.locked]
     if not locations:
         return None
 
     location = random.choice(locations)
-    checked.append(location.name)
+    checked.add(location.name)
 
     item_text = getHint(getItemGenericName(location.item), world.clearer_hints).text
     if location.parent_region.dungeon:
@@ -306,7 +314,7 @@ def get_good_item_hint(spoiler, world, checked):
 
 def get_random_location_hint(spoiler, world, checked):
     locations = [location for location in world.get_filled_locations()
-            if not location.name in checked and \
+            if is_not_checked(location, checked) and \
             location.item.type not in ('Drop', 'Event', 'Shop', 'DungeonReward') and \
             not (location.parent_region.dungeon and \
                 isRestrictedDungeonItem(location.parent_region.dungeon, location.item)) and
@@ -315,7 +323,7 @@ def get_random_location_hint(spoiler, world, checked):
         return None
 
     location = random.choice(locations)
-    checked.append(location.name)
+    checked.add(location.name)
     dungeon = location.parent_region.dungeon
 
     item_text = getHint(getItemGenericName(location.item), world.clearer_hints).text
@@ -329,13 +337,13 @@ def get_random_location_hint(spoiler, world, checked):
 
 def get_specific_hint(spoiler, world, checked, type):
     hintGroup = getHintGroup(type, world)
-    hintGroup = list(filter(lambda hint: hint.name not in checked, hintGroup))
+    hintGroup = list(filter(lambda hint: is_not_checked(world.get_location(hint.name), checked), hintGroup))
     if not hintGroup:
         return None
 
     hint = random.choice(hintGroup)
     location = world.get_location(hint.name)
-    checked.append(location.name)
+    checked.add(location.name)
 
     location_text = hint.text
     if '#' not in location_text:
@@ -366,19 +374,21 @@ def get_dungeon_hint(spoiler, world, checked):
 
 
 def get_entrance_hint(spoiler, world, checked):
-    if world.entrance_shuffle == 'off':
+    if not world.entrance_shuffle:
         return None
 
-    entrance_hints = getHintGroup('entrance', world)
-    entrance_hints = list(filter(lambda hint: hint.name not in checked, entrance_hints))
-    valid_entrance_hints = [entrance_hint for entrance_hint in entrance_hints if world.get_entrance(entrance_hint.name).shuffled]
+    entrance_hints = list(filter(lambda hint: hint.name not in checked, getHintGroup('entrance', world)))
+    shuffled_entrance_hints = list(filter(lambda entrance_hint: world.get_entrance(entrance_hint.name).shuffled, entrance_hints))
+
+    regions_with_hint = [hint.name for hint in getHintGroup('region', world)]
+    valid_entrance_hints = list(filter(lambda entrance_hint: world.get_entrance(entrance_hint.name).connected_region.name in regions_with_hint, shuffled_entrance_hints))
 
     if not valid_entrance_hints:
         return None
 
     entrance_hint = random.choice(valid_entrance_hints)
     entrance = world.get_entrance(entrance_hint.name)
-    checked.append(entrance.name)
+    checked.add(entrance.name)
 
     entrance_text = entrance_hint.text
 
@@ -404,7 +414,7 @@ def get_junk_hint(spoiler, world, checked):
         return None
 
     hint = random.choice(hints)
-    checked.append(hint.name)
+    checked.add(hint.name)
 
     return (GossipText(hint.text, prefix=''), None)
 
@@ -513,7 +523,7 @@ def buildGossipHints(spoiler, world):
             playthrough.spot_access(world.get_location(stone.location))
             and playthrough.state_list[world.id].guarantee_hint())
 
-    checkedLocations = []
+    checkedLocations = set()
 
     stoneIDs = list(gossipLocations.keys())
 
@@ -529,7 +539,7 @@ def buildGossipHints(spoiler, world):
     alwaysLocations = getHintGroup('always', world)
     for hint in alwaysLocations:
         location = world.get_location(hint.name)
-        checkedLocations.append(hint.name)
+        checkedLocations.add(hint.name)
 
         location_text = getHint(location.name, world.clearer_hints).text
         if '#' not in location_text:
@@ -667,25 +677,17 @@ def buildGanonText(world, messages):
     update_message_by_id(messages, 0x70CB, text)
 
     # light arrow hint or validation chest item
-    if world.trials == 0:
-        text = get_raw_text(getHint('Light Arrow Location', world.clearer_hints).text)
-        if world.distribution.get_starting_item('Light Arrows') > 0:
-            text += "\x05\x42your pocket\x05\x40"
-        else:
-            location = world.light_arrow_location
-            location_hint = get_hint_area(location).replace('Ganon\'s Castle', 'my castle')
-            if world.id != location.world.id:
-                text += "\x05\x42Player %d's\x05\x40 %s" % (location.world.id +1, get_raw_text(location_hint))
-            else:
-                text += get_raw_text(location_hint)
-        text += '!'
+    text = get_raw_text(getHint('Light Arrow Location', world.clearer_hints).text)
+    if world.distribution.get_starting_item('Light Arrows') > 0:
+        text += "\x05\x42your pocket\x05\x40"
     else:
-        text = get_raw_text(getHint('Validation Line', world.clearer_hints).text)
-        for location in world.get_filled_locations():
-            if location.name == 'Ganons Tower Boss Key Chest':
-                text += get_raw_text(getHint(getItemGenericName(location.item), world.clearer_hints).text)
-                text += '!'
-                break
+        location = world.light_arrow_location
+        location_hint = get_hint_area(location).replace('Ganon\'s Castle', 'my castle')
+        if world.id != location.world.id:
+            text += "\x05\x42Player %d's\x05\x40 %s" % (location.world.id +1, get_raw_text(location_hint))
+        else:
+            text += get_raw_text(location_hint)
+    text += '!'
 
     update_message_by_id(messages, 0x70CC, text)
 
