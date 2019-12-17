@@ -3286,7 +3286,7 @@ setting_infos = [
         gui_type       = "Combobox",
         shared         = False,
         choices        = get_c_button_color_options(),
-        default        = 'Default Yellow',
+        default        = 'Yellow',
         gui_tooltip    = '''\
             'Random Choice': Choose a random
             color from this list of colors.

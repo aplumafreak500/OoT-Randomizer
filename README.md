@@ -8,7 +8,7 @@ Instead, you can open an issue on this fork [here](https://github.com/aplumafrea
 
 Differences between this branch and the main Dev branch (on [Testrunner's Fork](https://github.com/TestRunnerSRL/OoT-Randomizer/tree/Dev)):
 * Various GUI tweaks and improvements along with setting tooltip/option changes
-* "Add Open Kakariko Gate" option to have the gate to Death Mountain being open from the start, as well as the Mask Shop opening upon obtaining Zelda's Letter without needing to show it to the guard from [Cuphat's Open Mask Shop Branch](https://github.com/Cuphat/OoT-Randomizer/tree/open_kak_mask_shop)
+* "Open Kakariko Gate" option to have the gate to Death Mountain being open from the start, as well as the Mask Shop opening upon obtaining Zelda's Letter without needing to show it to the guard from [Cuphat's Open Mask Shop Branch](https://github.com/Cuphat/OoT-Randomizer/tree/open_kak_mask_shop)
 * New cosmetic options to configure HUD Button colors from [Cuphat's HUD Colors Branch](https://github.com/Cuphat/OoT-Randomizer/tree/hud_colors)
 * "Entrance Shuffle" (aka ER) is changed into a set of more advanced and customizable options including mixing entrance pools, decoupling entrances and randomizing overworld spawns or warp songs.
 * Picking up Gold Skulltula Tokens in non-Tokensanity displays a self-closing textbox which no longer freezes the player.
