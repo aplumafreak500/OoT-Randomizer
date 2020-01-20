@@ -291,6 +291,8 @@ entrance_shuffle_table = [
     ('Overworld',       ('Zoras Domain Behind King Zora -> Zoras Fountain',                 { 'index': 0x0225 }),
                         ('Zoras Fountain -> Zoras Domain Behind King Zora',                 { 'index': 0x01A1 })),
 
+    ('Overworld',       ('Gerudo Valley Lower Stream -> Lake Hylia',                        { 'index': 0x0219 })),
+
     ('OwlDrop',         ('Lake Hylia Owl Flight -> Hyrule Field',                           { 'index': 0x027E, 'addresses': [0xAC9F26] })),
     ('OwlDrop',         ('Death Mountain Owl Flight -> Kakariko Impa Ledge',                { 'index': 0x0554, 'addresses': [0xAC9EF2] })),
 
@@ -380,6 +382,8 @@ def shuffle_random_entrances(worlds):
         if worlds[0].shuffle_overworld_entrances:
             exclude_overworld_reverse = worlds[0].mix_entrance_pools and not worlds[0].decouple_entrances
             entrance_pools['Overworld'] = world.get_shufflable_entrances(type='Overworld', only_primary=exclude_overworld_reverse)
+            if not worlds[0].decouple_entrances:
+                entrance_pools['Overworld'].remove(world.get_entrance('Gerudo Valley Lower Stream -> Lake Hylia'))
 
         # Set shuffled entrances as such
         for entrance in list(chain.from_iterable(one_way_entrance_pools.values())) + list(chain.from_iterable(entrance_pools.values())):

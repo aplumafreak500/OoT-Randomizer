@@ -2009,8 +2009,11 @@ setting_infos = [
         gui_text       = 'Decouple Entrances',
         gui_tooltip    = '''\
             Decouple entrances when shuffling them.
-            This means you are no longer guaranteed to end up back where 
-            you came from when you go back through an entrance.
+            This means you are no longer guaranteed to end up back where you
+            came from when you go back through an entrance.
+
+            This also adds the one-way entrance from Gerudo Valley to Lake Hylia
+            in the pool of overworld entrances when they are shuffled.
         ''',
         default        = False,
         shared         = True,
