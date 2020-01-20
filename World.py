@@ -12,7 +12,7 @@ from LocationList import business_scrubs
 from Region import Region, TimeOfDay
 from Rules import set_rules, set_shop_rules
 from RuleParser import Rule_AST_Transformer
-from SettingsList import get_setting_info
+from SettingsList import get_setting_info, get_settings_from_section
 from State import State
 from Utils import read_json
 
@@ -143,6 +143,11 @@ class World(object):
     def resolve_random_settings(self):
         # evaluate settings (important for logic, nice for spoiler)
         self.randomized_list = []
+        if self.randomize_settings:
+            setting_info = get_setting_info('randomize_settings')
+            self.randomized_list.extend(setting_info.disable[True]['settings'])
+            for section in setting_info.disable[True]['sections']:
+                self.randomized_list.extend(get_settings_from_section(section))
         if self.big_poe_count_random:
             self.big_poe_count = random.randint(1, 10)
             self.randomized_list.append('big_poe_count')
