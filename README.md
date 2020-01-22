@@ -96,13 +96,15 @@ player.
 #### Updated Settings 
 * Open Zora Fountain now has an open only adult option.
 * Added a new setting `Ice Trap Appearance` to select whether ice traps appear as major items (the default), junk items, or anything. This appearance does not presently affect chest size with Chest Size Matches Contents enabled, due to a bug.
-* Added a new trick `Goron City Spinning Pot PoH without Explosives`, which allows stopping the Spinning Pot using a bomb flower.
-
-#### Other Changes
 * Logic now requires Stone of Agony to access any hidden grotto.
   * A new trick `Hidden Grottos without Stone of Agony` will bypass this.
   * Stone of Agony is now only considered a useless item (for barren areas) when this trick is on and Gossip Stones do not use it.
+* Added a new trick `Goron City Spinning Pot PoH without Explosives`, which allows stopping the Spinning Pot using a bomb flower.
+* Hell Mode preset includes both the above tricks.
+
+#### Other Changes
 * Cosmetic heart color setting now applies in the file select screen.
+* Cosmetic tunic color setting now applies to the icons in the pause menu.
 * Non-Always Location hints cannot be placed for an area that already has a Foolish hint.
   * If the location hint is placed first, then it can still appear in a foolish hinted area, however in Tournament hint distribution the Foolish hints are placed first so that cannot happen.
 * The location containing Light Arrows will be considered a hinted location if Ganondorf's hint can be reached without them.
@@ -114,6 +116,7 @@ player.
 * Plando will now accept JSON lists for `item` in the location dictionary to randomly choose between for placement.
   * Attempts to not exceed item pool values until all the pool counts for the items in the list are reached.
 * Further seed generation speed improvements.
+* The main search algorithm was renamed Search (from Playthrough) to avoid confusion with the spoiler playthrough.
 
 #### Bug Fixes
 * Minor stability fix in Plando
