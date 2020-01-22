@@ -1305,7 +1305,7 @@
             "Goron City": "True",
             "Death Mountain Summit": "
                 here(can_blast_or_smash) or (is_adult and here(can_plant_bean and Progressive_Strength_Upgrade))",
-            "Dodongos Cavern Entryway": "
+            "Dodongos Cavern Beginning": "
                 has_explosives or Progressive_Strength_Upgrade or is_adult",
             "Mountain Storms Grotto": "can_open_storm_grotto"
         }
