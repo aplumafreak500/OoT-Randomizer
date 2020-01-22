@@ -86,6 +86,8 @@ player.
   * Collect some number of Triforce Pieces to beat the game instead of beating Ganon
   * Multiworld Triforce counts are collective, so once the total is reached across all players everyone wins.
   * If enabled via randomizing main rules, the count is always 20.
+* Separate Double Defense model
+  * Now appears as a color-shifted version of the Heart Container, with a transparent interior and prominent gold border.
 
 #### Updated Settings 
 * Open Zora Fountain now has an open only adult option.
@@ -101,6 +103,8 @@ player.
 * Updated Compressor. The GUI progress bar is now granular. If for some reason, the rom won't fit into 32MB, then the compressor will increase the output size.
 * Refactored Logic once again. It now uses helper json rules and rules can reference other rules.
 * Disabled settings don't show up in the spoiler.
+* Plando will now accept JSON lists for `item` in the location dictionary to randomly choose between for placement.
+  * Attempts to not exceed item pool values until all the pool counts for the items in the list are reached.
 * Further seed generation speed improvements.
 
 #### Bug Fixes
