@@ -96,8 +96,12 @@ player.
 #### Updated Settings 
 * Open Zora Fountain now has an open only adult option.
 * Added a new setting `Ice Trap Appearance` to select whether ice traps appear as major items (the default), junk items, or anything. This appearance does not presently affect chest size with Chest Size Matches Contents enabled, due to a bug.
+* Added a new trick `Goron City Spinning Pot PoH without Explosives`, which allows stopping the Spinning Pot using a bomb flower.
 
 #### Other Changes
+* Logic now requires Stone of Agony to access any hidden grotto.
+  * A new trick `Hidden Grottos without Stone of Agony` will bypass this.
+  * Stone of Agony is now only considered a useless item (for barren areas) when this trick is on and Gossip Stones do not use it.
 * Cosmetic heart color setting now applies in the file select screen.
 * Non-Always Location hints cannot be placed for an area that already has a Foolish hint.
   * If the location hint is placed first, then it can still appear in a foolish hinted area, however in Tournament hint distribution the Foolish hints are placed first so that cannot happen.
@@ -113,6 +117,8 @@ player.
 
 #### Bug Fixes
 * Minor stability fix in Plando
+* Plando no longer occasionally attempts to place an item on a location where it's not allowed.
+* Starting items for adult that auto-equip do so correctly now. (Non-Kokiri Tunics won't autoequip at the moment.)
 * Fixed two chests in MQ Shadow Temple that had swapped names in plando and spoilers.
 * Removed (unnecessarily) duplicated/overlapping hints.
 * Hints that should come in multiples (duplicates) no longer come in singletons in certain corner cases.

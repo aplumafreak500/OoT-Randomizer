@@ -557,8 +557,8 @@ class World(object):
             self.shuffle_scrubs == 'off' and not self.shuffle_grotto_entrances):
             # nayru's love may be required to prevent forced damage
             exclude_item_list.append('Nayrus Love')
-        if self.hints != 'agony':
-            # Stone of Agony only required if it's used for hints
+        if self.logic_grottos_without_agony and self.hints != 'agony':
+            # Stone of Agony skippable if not used for hints or grottos
             exclude_item_list.append('Stone of Agony')
         if not self.shuffle_special_interior_entrances and not self.shuffle_overworld_entrances and not self.warp_songs and not self.spawn_positions:
             # Serenade and Prelude are never required unless one of those settings is enabled
