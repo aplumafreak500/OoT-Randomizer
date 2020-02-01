@@ -1,4 +1,5 @@
 from version import __version__
+from Utils import data_path
 import random
 import Music as music
 import Sounds as sfx
@@ -566,6 +567,7 @@ def patch_heart_colors(rom, settings, log, symbols):
             rom.write_int16s(file_select_address + 6, color) # file select DD hearts
             if settings.correct_model_colors:
                 patch_model_colors(rom, color, model_addresses) # heart model colors
+                icon.patch_overworld_icon(rom, color, 0xF43D80) # Overworld Heart Icon
         log.heart_colors[heart] = dict(option=heart_option, color=''.join(['{:02X}'.format(c) for c in color]))
 
 
@@ -591,6 +593,8 @@ def patch_magic_colors(rom, settings, log, symbols):
         rom.write_int16s(symbol, color)
         if settings.correct_model_colors and magic_option != 'Green':
             patch_model_colors(rom, color, model_addresses)
+            icon.patch_overworld_icon(rom, color, 0xF45650, data_path('icons/magicSmallExtras.raw')) # Overworld Small Pot
+            icon.patch_overworld_icon(rom, color, 0xF47650, data_path('icons/magicLargeExtras.raw')) # Overworld Big Pot
         log.magic_colors[magic_color] = dict(option=magic_option, color=''.join(['{:02X}'.format(c) for c in color]))
 
 

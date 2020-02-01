@@ -607,85 +607,49 @@ def validate_world(world, worlds, entrance_placed, locations_to_ensure_reachable
                 elif entrance.name in ADULT_FORBIDDEN and not entrance_unreachable_as(entrance, 'adult', already_checked=[entrance.reverse]):
                     raise EntranceShuffleError('%s is potentially accessible as adult' % entrance.name)
 
-    max_search = None
-
     if locations_to_ensure_reachable:
-        max_search = Search.max_explore([world.state for world in worlds], itempool)
-        # If ALR is enabled, ensure all locations we want to keep reachable are indeed still reachable 
+        max_search = Search.max_explore([w.state for w in worlds], itempool)
+        # If ALR is enabled, ensure all locations we want to keep reachable are indeed still reachable
         # Otherwise, just continue if the game is still beatable
-        if not (worlds[0].check_beatable_only and max_search.can_beat_game(False)):
+        if not (world.check_beatable_only and max_search.can_beat_game(False)):
             max_search.visit_locations(locations_to_ensure_reachable)
             for location in locations_to_ensure_reachable:
                 if not max_search.visited(location):
                     raise EntranceShuffleError('%s is unreachable' % location.name)
 
-    if (entrance_placed == None and worlds[0].shuffle_special_indoor_entrances) or \
-       (entrance_placed != None and entrance_placed.type in ['SpecialInterior', 'Overworld']):
-        if max_search == None:
-            max_search = Search.max_explore([world.state for world in worlds], itempool)
+    if (world.shuffle_special_interior_entrances or world.shuffle_overworld_entrances or world.spawn_positions) and \
+       (entrance_placed == None or world.mix_entrance_pools or entrance_placed.type in ['SpecialInterior', 'Overworld', 'Spawn', 'WarpSong', 'OwlDrop']):
+            # At least one valid starting region with all basic refills should be reachable without using any items at the beginning of the seed
+            # Note this creates an empty State rather than reuse world.state (which already has starting items).
+            no_items_search = Search([State(w) for w in worlds])
 
-        for world in worlds:
-            # Links House entrance should be reachable as child at some point in the seed
-            links_house_entrance = get_entrance_replacing(world.get_region('Links House'), 'Kokiri Forest -> Links House')
-            if not max_search.spot_access(links_house_entrance, age='child'):
-                raise EntranceShuffleError('Links House Entrance is never reachable as child')
-
-            # Temple of Time entrance should be reachable as both ages at some point in the seed
-            temple_of_time_entrance = get_entrance_replacing(world.get_region('Temple of Time'), 'Temple of Time Exterior -> Temple of Time')
-            if not max_search.spot_access(temple_of_time_entrance, age='both'):
-                raise EntranceShuffleError('Temple of Time Entrance is never reachable as both ages')
-
-            # Windmill door entrance should be reachable as both ages at some point in the seed
-            windmill_door_entrance = get_entrance_replacing(world.get_region('Windmill'), 'Kakariko Village -> Windmill')
-            if not max_search.spot_access(windmill_door_entrance, age='both'):
-                raise EntranceShuffleError('Windmill Door Entrance is never reachable as both ages')
-
-            # Potion Shop front door should be reachable as both ages at some point in the seed
-            potion_front_entrance = get_entrance_replacing(world.get_region('Kakariko Potion Shop Front'), 'Kakariko Village -> Kakariko Potion Shop Front')
-            if not max_search.spot_access(potion_front_entrance, age='both'):
-                raise EntranceShuffleError('Adult Potion Front Entrance is never reachable as both ages')
-
-            # Potion Shop back door should be reachable as adult at some point in the seed
-            potion_back_entrance = get_entrance_replacing(world.get_region('Kakariko Potion Shop Back'), 'Kakariko Village Backyard -> Kakariko Potion Shop Back')
-            if not max_search.spot_access(potion_back_entrance, age='adult'):
-                raise EntranceShuffleError('Adult Potion Back Entrance is never reachable as Adult')
-
-            check_same_hint_region(potion_front_entrance, potion_back_entrance)
-
-        # At least one valid starting region with all basic refills should be reachable without using any items at the beginning of the seed
-        # Note this creates an empty State rather than reuse world.state (which already has starting items).
-        no_items_search = Search([State(world) for world in worlds])
-
-        valid_starting_regions = ['Kokiri Forest', 'Kakariko Village']
-        for world in worlds:
+            valid_starting_regions = ['Kokiri Forest', 'Kakariko Village']
             if not any(region for region in valid_starting_regions if no_items_search.can_reach(world.get_region(region))):
                 raise EntranceShuffleError('Invalid starting area')
 
-        # Check that a region where time passes is always reachable as both ages without having collected any items (except in closed forest)
-        time_travel_search = Search.with_items([world.state for world in worlds], [ItemFactory('Time Travel', world=world) for world in worlds])
+            # Check that a region where time passes is always reachable as both ages without having collected any items (except in closed forest)
+            time_travel_search = Search.with_items([w.state for w in worlds], [ItemFactory('Time Travel', world=w) for w in worlds])
 
-        for world in worlds:
             if not (any(region for region in time_travel_search.reachable_regions('child') if region.time_passes and region.world == world) and
                     any(region for region in time_travel_search.reachable_regions('adult') if region.time_passes and region.world == world)):
                 raise EntranceShuffleError('Time passing is not guaranteed as both ages')
 
-        # When starting as adult, child Link should be able to reach ToT without having collected any items
-        # This is important to ensure that the player never loses access to the pedestal after going child
-        if any(world.starting_age == 'adult' for world in worlds):
-            for world in worlds:
-                if world.starting_age == 'adult' and not time_travel_search.can_reach(world.get_region('Temple of Time'), age='child'):
-                    raise EntranceShuffleError('Links House to Temple of Time path as child is not guaranteed')
+            # The player should be able to get back to ToT after going through time, without having collected any items
+            # This is important to ensure that the player never loses access to the pedestal after going through time
+            if world.starting_age == 'child' and not time_travel_search.can_reach(world.get_region('Temple of Time'), age='adult'):
+                raise EntranceShuffleError('Path to Temple of Time as adult is not guaranteed')
+            elif world.starting_age == 'adult' and not time_travel_search.can_reach(world.get_region('Temple of Time'), age='child'):
+                raise EntranceShuffleError('Path to Temple of Time as child is not guaranteed')
 
     if (world.shuffle_interior_entrances or world.shuffle_overworld_entrances) and \
        (entrance_placed == None or world.mix_entrance_pools or entrance_placed.type in ['Interior', 'SpecialInterior', 'Overworld', 'Spawn', 'WarpSong', 'OwlDrop']):
         # The Big Poe Shop should always be accessible as adult without the need to use any bottles
         # Since we can't guarantee that items in the pool won't be placed behind bottles, we guarantee the access without using any items
         # This is important to ensure that players can never lock their only bottles by filling them with Big Poes they can't sell
-        no_items_time_travel_search = Search.with_items([State(world) for world in worlds], [ItemFactory('Time Travel', world=world) for world in worlds])
+        no_items_time_travel_search = Search.with_items([State(w) for w in worlds], [ItemFactory('Time Travel', world=w) for w in worlds])
 
-        for world in worlds:
-            if not no_items_time_travel_search.can_reach(world.get_region('Castle Town Rupee Room'), age='adult'):
-                raise EntranceShuffleError('Big Poe Shop access is not guaranteed as adult')
+        if not no_items_time_travel_search.can_reach(world.get_region('Castle Town Rupee Room'), age='adult'):
+            raise EntranceShuffleError('Big Poe Shop access is not guaranteed as adult')
 
         if world.shuffle_cows:
             impas_front_entrance = get_entrance_replacing(world.get_region('Impas House'), 'Kakariko Village -> Impas House')

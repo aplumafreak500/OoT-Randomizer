@@ -13,8 +13,7 @@ Differences between this branch and the main Dev branch (on [Testrunner's Fork](
 * "Entrance Shuffle" (aka ER) is changed into a set of more advanced and customizable options including mixing entrance pools, decoupling entrances and randomizing overworld spawns or warp songs.
 * Picking up Gold Skulltula Tokens in non-Tokensanity displays a self-closing textbox which no longer freezes the player.
 * "Bombchus In Logic" is improved to include bombchu drops (from grass, pots, etc) that start dropping once you have found Bombchus.
-* New cosmetic option to have all ingame item model colors match cosmetic colors (for hearts, magic and gauntlets), except item drop icons which aren't handled yet.
-* Double Defense has a separate item model to differentiate it from Heart Containers.
+* New cosmetic option to have all ingame item model colors, as well as drop icons, match cosmetic colors (for hearts, magic and gauntlets).
 
 ## Index
 
@@ -101,6 +100,10 @@ player.
   * Stone of Agony is now only considered a useless item (for barren areas) when this trick is on and Gossip Stones do not use it.
 * Added a new trick `Goron City Spinning Pot PoH without Explosives`, which allows stopping the Spinning Pot using a bomb flower.
 * Hell Mode preset includes both the above tricks.
+* Tricks enabled/disabled in a Plandomizer file now take precedence over Tricks in Detailed Logic, even if the Plandomizer file has an empty list.
+  * An empty list means the seed will be beatable without any tricks.
+  * If there's no `allowed_tricks` item in the file, the Detailed Logic tricks apply instead.
+  * If there is an `allowed_tricks` list in the file, it will not be possible to disable any of the enabled tricks (or enabling more) without editing the file.
 
 #### Other Changes
 * Cosmetic heart color setting now applies in the file select screen.
@@ -115,13 +118,17 @@ player.
 * Disabled settings don't show up in the spoiler.
 * Plando will now accept JSON lists for `item` in the location dictionary to randomly choose between for placement.
   * Attempts to not exceed item pool values until all the pool counts for the items in the list are reached.
+* "Start with" settings are now handled by the Plando library.
 * Further seed generation speed improvements.
 * The main search algorithm was renamed Search (from Playthrough) to avoid confusion with the spoiler playthrough.
 
 #### Bug Fixes
 * Minor stability fix in Plando
+* Spoilers for plando'd seeds now correctly show the tricks enabled for the seed.
 * Plando no longer occasionally attempts to place an item on a location where it's not allowed.
-* Starting items for adult that auto-equip do so correctly now. (Non-Kokiri Tunics won't autoequip at the moment.)
+* Plando starting items and items set in specific locations now count toward the pool allocation. (Starting items are replaced with junk.)
+* Plando now refuses to place more than the maximum amount of bottles, adult trade items, shop items, or total non-junk items.
+* Starting items for adult that auto-equip should do so correctly now. (Non-Kokiri Tunics won't autoequip at the moment.)
 * Fixed two chests in MQ Shadow Temple that had swapped names in plando and spoilers.
 * Removed (unnecessarily) duplicated/overlapping hints.
 * Hints that should come in multiples (duplicates) no longer come in singletons in certain corner cases.
@@ -129,6 +136,7 @@ player.
 * Removed a misleading random "trials" value from the non-randomized settings in the spoiler.
 * Fix seed values with spaces no longer working.
 * Miscellaneous logic fixes.
+* Other bug fixes.
 
 ### 5.1
 
