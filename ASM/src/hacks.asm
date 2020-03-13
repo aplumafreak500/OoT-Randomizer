@@ -285,6 +285,7 @@
 ; Replaces: code that draws the fade-out rectangle on file load
 .orga 0xBAF738 ; In memory: 0x803B3538
 .area 0x60, 0
+    or      a1, r0, s0   ; menu data
     jal     draw_file_select_hash
     andi    a0, t8, 0xFF ; a0 = alpha channel of fade-out rectangle
 
@@ -1663,3 +1664,65 @@ skip_GS_BGS_text:
     jr      ra
     nop
 .endarea
+
+; ==================================================================================================
+; Chain Horseback Archery Rewards
+; ==================================================================================================
+; Replaces: jal     0x80022AD0
+;           sw      a0, 0x0018(sp)
+.orga 0xE12A04
+    jal     handle_hba_rewards_chain
+    sw      a0, 0x0018(sp)
+
+; Replaces: sw      t6, 0x02A4(a0)
+.orga 0xE12A20
+    sw      v1, 0x02A4(a0)
+
+;==================================================================================================
+; Carpet Salesman Shop Shuffle
+;==================================================================================================
+; Replaces: sw      a1, 0x001C(sp)
+;           sw      a2, 0x0020(sp)
+.orga 0xE5B2F4
+    jal     carpet_inital_message
+    sw      a1, 0x001C(sp)
+
+; Replaces: lui     a3, 0x461C
+;           ori     a3, a3, 0x4000
+.orga 0xE5B538
+    jal     carpet_buy_item_hook
+    lui     a3, 0x461C
+
+;==================================================================================================
+; Medigoron Shop Shuffle
+;==================================================================================================
+; Replaces: lui     a3, 0x43CF
+;           ori     a3, a3, 0x8000
+.orga 0xE1FEAC
+    jal     medigoron_buy_item_hook
+    lui     a3, 0x43CF
+
+; Replaces: lui     v1, 0x8012
+;           addiu   v1, v1, 0xA5D0
+;           lw      t6, 0x0004(v1)
+;           addiu   at, zero, 0x0005
+;           addiu   v0, zero, 0x0011
+;           beq     t6, zero, @medigoron_check_2nd_part
+;           lui     a0, 0x8010
+;           b       @medigoron_check_2nd_part
+;           addiu   v0, zero, 0x0005
+; @medigoron_check_2nd_part:
+.orga 0xE1F72C
+    addiu   sp, sp, -0x18
+    jal     medigoron_inital_check
+    sw      ra, 0x14(sp)
+    lw      ra, 0x14(sp)
+    bnez    v0, @medigoron_check_return
+    addiu   sp, sp, 0x18
+    beq     t6, zero, @medigoron_check_2nd_part
+    addiu   v0, zero, 0x0011
+    addiu   v0, zero, 0x0005
+@medigoron_check_2nd_part:
+
+.orga 0xE1F794
+@medigoron_check_return:

@@ -102,7 +102,7 @@ void update_hud_colors() {
   (*text_cursor_border_max) = text_cursor_glow_color;
 }
 
-colorRGB8_t rupee_colors[] = {
+const colorRGB8_t rupee_colors[4] = {
   { 0xC8, 0xFF, 0x64 }, // Base Wallet (Green)
   { 0x82, 0x82, 0xFF }, // Adult's Wallet (Blue)
   { 0xFF, 0x64, 0x64 }, // Giant's Wallet (Red)

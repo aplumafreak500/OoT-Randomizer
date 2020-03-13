@@ -22,6 +22,9 @@ sprite_t quest_items_sprite;
 sprite_t font_sprite;
 sprite_t dpad_sprite;
 sprite_t triforce_sprite;
+sprite_t song_note_sprite;
+sprite_t key_rupee_clock_sprite;
+sprite_t item_digit_sprite;
 
 void gfx_init();
 

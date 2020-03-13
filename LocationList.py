@@ -96,7 +96,8 @@ location_table = {
     "Lake Hylia Sun":                                  ("NPC",         0x57,  0x58, None,                     ("Lake Hylia",)),
     "Gerudo Fortress Membership Card":                 ("NPC",         0x0C,  0x3A, None,                     ("Gerudo's Fortress", "Gerudo",)),
     "Ocarina of Time":                                 ("NPC",         0x51,  0x0C, None,                     ("Hyrule Field", "Need Spiritual Stones",)),
-    "Haunted Wasteland Bombchu Salesman":              ("NPC",         None,  None, None,                     ("Haunted Wasteland",)),
+    "Haunted Wasteland Bombchu Salesman":              ("NPC",         0x5E,  0x03, None,                     ("Haunted Wasteland",)),
+    "Medigoron":                                       ("NPC",         0x62,  0x28, None,                     ("Goron City",)),
 
     "Impa House Freestanding PoH":                     ("Collectable", 0x37,  0x01, None,                     ("Kakariko Village", "Kakariko",)),
     "Tektite Grotto Freestanding PoH":                 ("Collectable", 0x3E,  0x01, None,                     ("Hyrule Field", "Grottos",)),
@@ -824,8 +825,10 @@ location_groups = {
     'Collectable': [name for (name, data) in location_table.items() if data[0] == 'Collectable'],
     'BossHeart': [name for (name, data) in location_table.items() if data[0] == 'BossHeart'],
     'CollectableLike': [name for (name, data) in location_table.items() if data[0] in ('Collectable', 'BossHeart', 'GS Token')],
+    'CanSee': [name for (name, data) in location_table.items() if data[0] in ('Collectable', 'BossHeart', 'GS Token', 'Shop')],
     'Dungeon': [name for (name, data) in location_table.items() if data[4] is not None and any(dungeon in data[4] for dungeon in dungeons)],
 }
+
 
 # Function to run exactly once after after placing items in drop locations for each world
 # Sets all Drop locations to a unique name in order to avoid name issues and to identify locations in the spoiler
