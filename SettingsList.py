@@ -1705,6 +1705,16 @@ setting_infos = [
         shared         = True,
     ),
     Checkbutton(
+        name           = 'all_cutscenes',
+        gui_text       = 'Enable All Cutscenes',
+        gui_tooltip    = '''\
+            Most remaining cutscenes will be re-enabled.
+            Useful if Shuffle Text is enabled, for added
+            hilarity.
+        ''',
+        shared         = True,
+    ),
+    Checkbutton(
         name           = 'fast_chests',
         gui_text       = 'Fast Chest Cutscenes',
         gui_tooltip    = '''\
