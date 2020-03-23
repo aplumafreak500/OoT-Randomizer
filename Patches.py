@@ -149,7 +149,7 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
         # rom.write_byte(rom.sym('DONT_SKIP_CS'), 1)
 
 	# Undo intro CS skip
-	rom.write_int16(0xB06BBA, 0xFFF1)
+        rom.write_int16(0xB06BBA, 0xFFF1)
 
     if not world.all_cutscenes:
         # Speed Zelda's Letter scene
