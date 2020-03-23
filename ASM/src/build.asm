@@ -1,6 +1,12 @@
 .n64
 .relativeinclude on
 
+// version guard, prevent people from building with older armips versions
+.if (version() < 101)
+.notice version()
+.error   "Detected armips build is too old. Please install https://github.com/Kingcom/armips from HEAD, then locally remove this notice, or increase the ARMIPS_VERSION_REVISION in armips and rebuild to bypass this notice."
+.endif
+
 .create "../roms/patched.z64", 0
 .incbin "../roms/base.z64"
 .include "macros.asm"
@@ -81,6 +87,8 @@ RANDO_CONTEXT:
 .include "horseback_archery.asm"
 .include "carpet_salesman.asm"
 .include "medigoron.asm"
+
+.align 0x10
 .importobj "../build/bundle.o"
 .align 8
 FONT_TEXTURE:

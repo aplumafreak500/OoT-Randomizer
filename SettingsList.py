@@ -1739,7 +1739,8 @@ setting_infos = [
         name           = 'start_with_rupees',
         gui_text       = 'Start with Max Rupees',
         gui_tooltip    = '''\
-            Start the game with 99 rupees. Wallet upgrades fill wallet.
+            Start the game with a full wallet.
+            Wallet upgrades will also fill the wallet.
         ''',
         shared         = True,
     ),
@@ -1747,8 +1748,7 @@ setting_infos = [
         name           = 'start_with_consumables',
         gui_text       = 'Start with Consumables',
         gui_tooltip    = '''\
-            Start the game with maxed out Deku Sticks and Deku Nuts,
-            along with maximum ammo for any other starting items.
+            Start the game with maxed out Deku Sticks and Deku Nuts.
         ''',
         shared         = True,
     ),
@@ -2557,9 +2557,6 @@ setting_infos = [
         gui_tooltip    = '''\
             Begin the game with the selected equipment.
         ''',
-        disable        = {
-            'kokiri_sword': {'settings' : ['shuffle_kokiri_sword']}
-        }
     ),
     Setting_Info(
         name           = 'starting_items',
@@ -2573,19 +2570,12 @@ setting_infos = [
         default        = [],
         gui_tooltip    = '''\
             Begin the game with the selected inventory items.
-            Unless "Start with Consumables" is selected, items
-            don't come with any ammo.
-            
             Selecting multiple progressive items will give
             the appropriate number of upgrades.
             
             If playing with Open Zora Fountain, the Bottle
             with Letter is converted to a regular Bottle.
         ''',
-        disable        = {
-            'ocarina'  : {'settings' : ['shuffle_ocarinas']},
-            'ocarina2' : {'settings' : ['shuffle_ocarinas']}
-        }
     ),
     Setting_Info(
         name           = 'starting_songs',
@@ -2720,15 +2710,14 @@ setting_infos = [
         },
         gui_tooltip    = '''\
             Changes the categories of items Ice Traps may
-            appear as when freestanding.
-            (With Chest Size Matches Contents enabled,
-            Ice Traps will always appear in large chests.)
+            appear as, both when freestanding and when in
+            chests with Chest Size Matches Contents enabled. 
 
             'Major Items Only': Ice Traps appear as Major
-            Items.
+            Items (and in large chests if CSMC enabled).
 
             'Junk Items Only': Ice Traps appear as Junk
-            Items.
+            Items (and in small chests if CSMC enabled).
 
             'Anything': Ice Traps may appear as anything.
         ''',
