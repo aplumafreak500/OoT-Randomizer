@@ -940,8 +940,9 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
         save_context.write_bits(0x0EDC, 0x80) # "Entered the Master Sword Chamber"
     # Always set this to prevent a Sheik-related softlock in ToT
     save_context.write_bits(0x0EDD, 0x20) # "Pulled Master Sword from Pedestal"
+    # For some reason this flag, if unset, makes all the Kokiri disappear...
+    save_context.write_bits(0x0EE0, 0x80) # "Spoke to Kaepora Gaebora by Lost Woods"
     if not world.all_cutscenes:
-        save_context.write_bits(0x0EE0, 0x80) # "Spoke to Kaepora Gaebora by Lost Woods"
         save_context.write_bits(0x0EE7, 0x20) # "Nabooru Captured by Twinrova"
         save_context.write_bits(0x0EE7, 0x10) # "Spoke to Nabooru in Spirit Temple"
     # May interfere with free time travel
