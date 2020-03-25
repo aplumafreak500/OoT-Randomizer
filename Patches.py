@@ -149,7 +149,9 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
         # rom.write_byte(rom.sym('DONT_SKIP_CS'), 1)
 
 	# Undo intro CS skip
-        rom.write_int16(0xB06BBA, 0xFFF1)
+        # TODO: Does this work when shuffling your spawn point?
+        if not world.spawn_positions: # Err on the side of caution.
+            rom.write_int16(0xB06BBA, 0xFFF1)
 
     if not world.all_cutscenes:
         # Speed Zelda's Letter scene
