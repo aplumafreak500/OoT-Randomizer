@@ -537,9 +537,10 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
         # Darunia won't dance
         rom.write_bytes(0x22769E4, [0xFF, 0xFF, 0xFF, 0xFF])
 
-        # Zora moves quickly
-        rom.write_bytes(0xE56924, [0x00, 0x00, 0x00, 0x00])
+    # Zora moves quickly
+    rom.write_bytes(0xE56924, [0x00, 0x00, 0x00, 0x00])
 
+    if not world.all_cutscenes:
         # Speed Jabu Jabu swallowing Link
         rom.write_bytes(0xCA0784, [0x00, 0x18, 0x00, 0x01, 0x00, 0x02, 0x00, 0x02])
 
