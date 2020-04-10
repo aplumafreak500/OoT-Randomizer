@@ -9,11 +9,10 @@ Instead, you can open an issue on this fork [here](https://github.com/aplumafrea
 Differences between this branch and the main Dev branch (on [Testrunner's Fork](https://github.com/TestRunnerSRL/OoT-Randomizer/tree/Dev)):
 * Various GUI tweaks and improvements along with setting tooltip/option changes
 * "Open Kakariko Gate" option to have the gate to Death Mountain being open from the start, as well as the Mask Shop opening upon obtaining Zelda's Letter without needing to show it to the guard from [Cuphat's Open Mask Shop Branch](https://github.com/Cuphat/OoT-Randomizer/tree/open_kak_mask_shop)
-* New cosmetic options to configure HUD Button colors from [Cuphat's HUD Colors Branch](https://github.com/Cuphat/OoT-Randomizer/tree/hud_colors)
+* HUD Button colors can be set or randomized separately for the A, B, C and Start buttons and have more available options.
 * "Entrance Shuffle" (aka ER) is changed into a set of more advanced and customizable options including mixing entrance pools, decoupling entrances and randomizing overworld spawns or warp songs.
 * Picking up Gold Skulltula Tokens in non-Tokensanity displays a self-closing textbox which no longer freezes the player.
 * "Bombchus In Logic" is improved to include bombchu drops (from grass, pots, etc) that start dropping once you have found Bombchus.
-* New cosmetic option to have all ingame item model colors, as well as drop icons, match cosmetic colors (for hearts, magic and gauntlets).
 * The "Skip First Dampe Race" setting is changed to "Skip First Minigame Phases", which also applies to the Horseback Archery minigame, and allows you to get both rewards at once if you score 1500 points in a single attempt.
 * New Inventory/Equipment/Status Icons Display in File Select from [rlbond86's Menu Icons Branch](https://github.com/rlbond86/OoT-Randomizer/tree/menu_icons)
 * New "Shuffle Medigoron & Carpet Salesman" option to have both of these NPCs sell a randomized item once at the price of 200 Rupees.
@@ -101,8 +100,23 @@ player.
 
 ### Dev
 
+#### New Features
+* New cosmetic setting `HUD Button Colors`
+  * The buttons shown on the HUD can be colored to match the N64 or Gamecube color scheme.
+  * Or you can completely randomize all the button colors.
+* New cosmetic setting `Item Model Colors Match Cosmetics`
+  * Freestanding models like heart containers, gauntlets, and heart/magic drops will match their respective color settings.
+  * Tunics are not affected, in order to keep freestanding tunics recognizable.
+
+#### Bug Fixes
+* Limit Kokiri Tunic RGB values in Glitched Logic to prevent Weirdshot crashes.
+* Prevent an errant `@` from showing up in Triforce Hunt.
+
 #### Other Changes
 * Performance improvements to seed generation.
+* Updated development n64 compilation process to use latest available toolchain.
+* Added decompressor source and updated Decompress binaries.
+* Mweep.
 
 ### 5.2
 

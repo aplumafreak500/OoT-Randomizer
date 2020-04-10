@@ -412,6 +412,18 @@ hintTable = {
     '1056':                                                     ("They say that the real Phantom Ganon is bright and loud.", None, 'junk'),
     '1057':                                                     ("They say that walking backwards is very fast.", None, 'junk'),
     '1058':                                                     ("They say that leaping above the Castle Town entrance enriches most children.", None, 'junk'),
+    '1059':                                                     ("They say that looking into darkness may find darkness looking back into you.", None, 'junk'),
+    '1060':                                                     ("You found a spiritual Stone! By which I mean, I worship Nayru.", None, 'junk'),
+    '1061':                                                     ("They say that the stick is mightier than the sword.", None, 'junk'),
+    '1062':                                                     ("Open your eyes.^Open your eyes.^Wake up, @.", None, 'junk'),
+    '1063':                                                     ("They say that arbitrary code execution leads to the credits sequence.", None, 'junk'),
+    '1064':                                                     ("They say that Twinrova always casts the same spell the first three times.", None, 'junk'),
+    '1065':                                                     ("They say that the Development branch may be unstable.", None, 'junk'),
+    '1066':                                                     ("You're playing a Randomizer. I'm randomized!^Here's a random number:  #4#.&Enjoy your Randomizer!", None, 'junk'),
+    '1067':                                                     ("They say Ganondorf's bolts can be reflected with glass or steel.", None, 'junk'),
+    '1068':                                                     ("They say Ganon's tail is vulnerable to nuts, arrows, swords, explosives, hammers...^...sticks, seeds, boomerangs...^...rods, shovels, iron balls, angry bees...", None, 'junk'),
+    '1069':                                                     ("They say that you're wasting time reading this hint, but I disagree. Talk to me again!", None, 'junk'),
+    '1070':                                                     ("They say Ganondorf knows where to find the instrument of his doom.", None, 'junk'),
 
     'Deku Tree':                                                ("an ancient tree", "Deku Tree", 'dungeonName'),
     'Dodongos Cavern':                                          ("an immense cavern", "Dodongo's Cavern", 'dungeonName'),
@@ -453,7 +465,7 @@ hintTable = {
     'lacs_dungeons':                                            ("all Spiritual Stones and Medallions", None, 'lacs'),
 
     'Spiritual Stone Text Start':                               ("3 Spiritual Stones found in Hyrule...", None, 'altar'),
-    'Child Altar Text End':                                     ("\x13\x08Ye who may become a Hero...&Stand with the Ocarina of Time&and play the Song of Time.", None, 'altar'),
+    'Child Altar Text End':                                     ("\x13\x08Ye who may become a Hero...&Stand with the Ocarina and&play the Song of Time.", None, 'altar'),
     'Adult Altar Text Start':                                   ("When evil rules all, an awakening&voice from the Sacred Realm will&call those destined to be Sages,&who dwell in the \x05\x41five temples\x05\x40.", None, 'altar'),
 
     'Validation Line':                                          ("Hmph... Since you made it this far,&I'll let you know what glorious&prize of Ganon's you likely&missed out on in my tower.^Behold...^", None, 'validation line'),
