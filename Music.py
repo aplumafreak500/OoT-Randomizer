@@ -38,6 +38,7 @@ bgm_sequence_ids = [
     ("Shooting Gallery", 0x4E),
     ("Sheik Theme", 0x4F),
     ("Zoras Domain", 0x50),
+    ("Meet Ganondorf", 0x54),
     ("Shop", 0x55),
     ("Chamber of the Sages", 0x56),
     ("Ice Cavern", 0x58),
