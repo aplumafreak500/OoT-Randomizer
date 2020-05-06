@@ -520,8 +520,8 @@ export class GUIGlobal {
         console.log("Remote:", remoteVersion);
         result.latestVersion = remoteVersion;
 
-        let currentSplit = res.replace('v', '').replace(' ', '.').split('.');
-        let remoteSplit = remoteVersion.replace('v', '').replace(' ', '.').split('.');
+        let currentSplit = res.replace('R-', '').replace('v', '').replace(' ', '.').split('.');
+        let remoteSplit = remoteVersion.replace('R-', '').replace('v', '').replace(' ', '.').split('.');
 
         //Compare versions
         if (Number(remoteSplit[0]) > Number(currentSplit[0])) {
@@ -534,6 +534,11 @@ export class GUIGlobal {
           else if (Number(remoteSplit[1]) == Number(currentSplit[1])) {
             if (Number(remoteSplit[2]) > Number(currentSplit[2])) {
               result.hasUpdate = true;
+            }
+            else if (Number(remoteSplit[2]) == Number(currentSplit[2])) {
+              if (Number(remoteSplit[3]) > Number(currentSplit[3])) {
+                result.hasUpdate = true;
+              }
             }
           }
         }

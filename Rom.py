@@ -141,7 +141,8 @@ class Rom(BigStream):
 
 
     def update_header(self):
-        self.write_bytes(0x35, get_version_bytes(__version__))
+        version_bytes = get_version_bytes(__version__)
+        self.write_bytes(0x35, version_bytes[:3])
         crc = calculate_crc(self)
         self.write_int32s(0x10, [crc[0], crc[1]])
 

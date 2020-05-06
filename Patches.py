@@ -866,33 +866,33 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
     if world.shuffle_dungeon_entrances:
         rom.write_byte(rom.sym('DUNGEONS_SHUFFLED'), 1)
 
-        # Connect lake hylia fill exit to revisit exit (Hylia blue will then be rewired below)
+        # Connect lake hylia fill exit to revisit exit
         rom.write_int16(0xAC995A, 0x060C)
 
-        # Remove deku sprout and drop player at SFM after forest (SFM blue will then be rewired by ER below)
-        rom.write_int16(0xAC9F96, 0x0608)
-
-        #Tell the well water we are always a child.
+        # Tell the well water we are always a child.
         rom.write_int32(0xDD5BF4, 0x00000000)
 
-        #Tell Sheik at Ice Cavern we are always an Adult
+        # Tell Sheik at Ice Cavern we are always an Adult
         rom.write_int32(0xC7B9C0, 0x00000000)
         rom.write_int32(0xC7BAEC, 0x00000000)
         rom.write_int32(0xc7BCA4, 0x00000000)
 
-        #Make the Adult well blocking stone dissappear if the well has been drained by
-        #checking the well drain event flag instead of links age. This actor doesn't need a
-        #code check for links age as the stone is absent for child via the scene alternate
-        #lists. So replace the age logic with drain logic.
+        # Make the Adult well blocking stone dissappear if the well has been drained by
+        # checking the well drain event flag instead of links age. This actor doesn't need a
+        # code check for links age as the stone is absent for child via the scene alternate
+        # lists. So replace the age logic with drain logic.
         rom.write_int32(0xE2887C, rom.read_int32(0xE28870)) #relocate this to nop delay slot
         rom.write_int32(0xE2886C, 0x95CEB4B0) # lhu
         rom.write_int32(0xE28870, 0x31CE0080) # andi
 
         remove_entrance_blockers(rom)
 
-        #Purge temp flags on entrance to spirit from colossus through the front
-        #door.
+        # Purge temp flags on entrance to spirit from colossus through the front door.
         rom.write_byte(0x021862E3, 0xC2)
+
+    if world.shuffle_overworld_entrances or world.shuffle_dungeon_entrances:
+        # Remove deku sprout and drop player at SFM after forest completion
+        rom.write_int16(0xAC9F96, 0x0608)
 
     if world.spawn_positions:
         # Fix save warping inside Link's House to not be a special case
@@ -1113,7 +1113,8 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
 
     # Add a gate-opening guard on the Wasteland side of the Gerudo gate when the card is shuffled or certain levels of ER.
     # Overrides the generic guard at the bottom of the ladder in Gerudo Fortress
-    if world.shuffle_gerudo_card or world.shuffle_overworld_entrances or world.shuffle_special_interior_entrances:
+    if world.shuffle_gerudo_card or world.shuffle_overworld_entrances or \
+       world.shuffle_special_interior_entrances or world.spawn_positions:
         # Add a gate opening guard on the Wasteland side of the Gerudo Fortress' gate
         new_gate_opening_guard = [0x0138, 0xFAC8, 0x005D, 0xF448, 0x0000, 0x95B0, 0x0000, 0x0301]
         rom.write_int16s(0x21BD3EC, new_gate_opening_guard)  # Adult Day
