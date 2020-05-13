@@ -517,6 +517,36 @@ hint_dist_sets = {
         'random':   (0.0, 0),
         'junk':     (0.0, 0),
     },
+    'co-op': OrderedDict({
+          'trial':    (0.0, 0),
+          'always':   (0.0, 3),
+          'woth':     (0.0, 0),
+          'barren':   (0.0, 0),
+          'item':     (0.0, 0),
+          'song':     (0.0, 0),
+          'minigame': (0.0, 0),
+          'ow':       (0.0, 0),
+          'dungeon':  (0.0, 0),
+          'entrance': (0.0, 0),
+          'sometimes': (8.0, 3),
+          'random':   (0.0, 0),
+          'junk':     (4.0, 1),
+    }),
+    'co-op woth': OrderedDict({
+          'trial':    (0.0, 0),
+          'always':   (0.0, 3),
+          'woth':     (3.0, 2),
+          'barren':   (0.0, 0),
+          'item':     (0.0, 0),
+          'song':     (0.0, 0),
+          'minigame': (0.0, 0),
+          'ow':       (0.0, 0),
+          'dungeon':  (0.0, 0),
+          'entrance': (0.0, 0),
+          'sometimes': (4.0, 3),
+          'random':   (0.0, 0),
+          'junk':     (13.0, 1),
+    }),
     'tournament': OrderedDict({
         # (number of hints, count per hint)
         'trial':     (0.0, 2),
@@ -607,7 +637,7 @@ def buildWorldGossipHints(spoiler, world, checkedLocations=None):
     hint_prob  = list(hint_prob)
     hint_counts = {}
 
-    if world.hint_dist == "tournament":
+    if world.hint_dist == "tournament" or world.hint_dist == "co-op" or world.hint_dist == "co-op woth":
         fixed_hint_types = []
         for hint_type in hint_types:
             fixed_hint_types.extend([hint_type] * int(hint_dist[hint_type][0]))
@@ -615,7 +645,7 @@ def buildWorldGossipHints(spoiler, world, checkedLocations=None):
         current_fill_type = fill_hint_types.pop(0)
 
     while stoneIDs:
-        if world.hint_dist == "tournament":
+        if world.hint_dist == "tournament" or world.hint_dist == "co-op" or world.hint_dist == "co-op woth":
             if fixed_hint_types:
                 hint_type = fixed_hint_types.pop(0)
             else:

@@ -2512,6 +2512,8 @@ setting_infos = [
             'balanced':    'Balanced',
             'strong':      'Strong',
             'very_strong': 'Very Strong',
+            'co-op': 'Co-op',
+            'co-op woth': 'Co-op WOTH',
             'tournament':  'Tournament',
         },
         gui_tooltip    = '''\

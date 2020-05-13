@@ -231,7 +231,7 @@ hintTable = {
     'Goron City Pot Freestanding PoH':                          ("spinning #Goron pottery# contains", None, ['overworld', 'sometimes']),
     'King Zora Thawed':                                         ("unfreezing #King Zora# grants", None, ['overworld', 'sometimes']),
     'DMC Deku Scrub Bombs':                                     ("in the Crater a #scrub# sells", None, ['overworld', 'sometimes']),
-
+    
     'Deku Tree MQ After Spinning Log Chest':                    ("within #a tree#, a temporal stone contains", None, ['dungeon', 'sometimes']),
     'GS Deku Tree MQ Basement Ceiling':                         ("within #a tree#, a spider on the ceiling holds", None, ['dungeon', 'sometimes']),
     'Boomerang Chest':                                          ("in the #belly of a deity#, a school of stingers guard", None, 'sometimes'),
@@ -259,6 +259,7 @@ hintTable = {
     'GS Spirit Temple MQ Lower Adult Right':                    ("within #the Colossus# a spider's symphony yields", None, ['dungeon', 'sometimes']),
     'Shadow Temple Hidden Floormaster Chest':                   (["shadows in an #invisible maze# guard", "after a free #boat ride# comes"], None, ['dungeon', 'sometimes']),
     'Shadow Temple MQ Bomb Flower Chest':                       (["shadows in an #invisible maze# guard", "after a free #boat ride# comes"], None, ['dungeon', 'sometimes']),
+    'GS Deku Tree Basement Back Room':                          ("within #a tree#, a spider behind a mud wall contains", None, ['dungeon', 'sometimes']),
 
     'Desert Colossus -> Desert Colossus Grotto':                ("lifting a rock in #the desert# reveals", None, 'entrance'),
     'Gerudo Valley -> Gerudo Valley Octorok Grotto':            ("on #a ledge in the valley#, a silver rock hides", None, 'entrance'),
