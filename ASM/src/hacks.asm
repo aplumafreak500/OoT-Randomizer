@@ -715,16 +715,17 @@ nop
 skip_GS_BGS_text:
 
 ;==================================================================================================
-; Empty bomb fix
+; Empty Bomb Fix
 ;==================================================================================================
 
 ; Replaces:
-;   lw      a1, 0x0018 (sp) ; bomb ovl+134
-;   lw      a0, 0x001C (sp)
-.orga 0xC0E404
-    jal     empty_bomb_fix
-    lw      a1, 0x0018 (sp)
+;sw      r0, 0x0428(v0)
+;sw      t5, 0x066C(v0)
 
+.orga 0xC0E77C
+    jal     empty_bomb
+    sw      r0, 0x0428(v0)
+    
 ;==================================================================================================
 ; Damage Multiplier
 ;==================================================================================================
@@ -1079,9 +1080,13 @@ skip_GS_BGS_text:
 ; Warp song speedup
 ;==================================================================================================
 ;
-.orga 0xBEA044
+.orga 0xBEA044 ;manually set next entrance and fade out type
    jal      warp_speedup
    nop
+
+.orga 0xB10CC0 ;set fade in type after the warp
+    jal     set_fade_in
+    lui     at, 0x0001
    
 
 ;==================================================================================================
@@ -1632,6 +1637,7 @@ skip_GS_BGS_text:
 ; Replaces: lhu     t0, 0x0EDA(v0)
 ;           or      a0, s0, zero
 ;           andi    t1, t0, 0x0008
+
 .orga 0xE565D0
     jal     kz_moved_check
     nop
@@ -1725,3 +1731,338 @@ skip_GS_BGS_text:
 
 .orga 0xE1F794
 @medigoron_check_return:
+
+;==================================================================================================
+; Remove File 3 From File Select
+;==================================================================================================
+;Main Menu Up
+; Replaces: sh      t6, 0xCA2A(at)
+;           lh      t7, 0x4A2A(v1)
+.orga 0xBAA168
+    jal     skip_3_up_main
+    sh      t6, 0xCA2A(at)
+
+;Main Menu Down
+; Replaces: sh      t5, 0xCA2A(at)
+;           lh      t6, 0x4A2A(v1)
+.orga 0xBAA198
+    jal     skip_3_down_main
+    sh      t5, 0xCA2A(at)
+
+;Copy From Up
+; Replaces: sh      t7, 0xCA2A(at)
+;           lh      v1, 0x4A2A(t0)
+.orga 0xBA16AC
+    jal     skip_3_up_copy_from
+    sh      t7, 0xCA2A(at)
+
+;Copy From Down
+; Replaces: sh      t9, 0xCA2A(at)
+;           lh      v1, 0x4A2A(t0)
+.orga 0xBA16E0
+    jal     skip_3_down_copy_from
+    sh      t9, 0xCA2A(at)
+
+;Copy To Up
+; Replaces: sh      t5, 0xCA2A(at)
+;           lh      t6, 0x4A38(t0)
+;           lh      v1, 0x4A2A(t0)
+.orga 0xBA1C68
+    jal     skip_3_up_copy_to
+    sh      t5, 0xCA2A(at)
+    lh      t6, 0x4A38(t0)
+
+;Copy To Down
+; Replaces: sh      t9, 0xCA2A(at)
+;           lh      v1, 0x4A2A(t0)
+.orga 0xBA1CD0
+    jal     skip_3_down_copy_to
+    sh      t9, 0xCA2A(at)
+
+;Special Case For Copy File 2 Down
+; Replaces: sh      t3, 0xCA2A(at)
+;           lh      v1, 0x4A2A(t0)
+.orga 0xBA1D04
+    jal     skip_3_down_copy_to_2
+    nop
+
+;Erase Up
+; Replaces: sh      t9, 0xCA2A(at)
+;           lh      v1, 0x4A2A(t0)
+.orga 0xBA32CC
+    jal     skip_3_up_erase
+    sh      t9, 0xCA2A(at)
+
+;Erase Down
+; Replaces: sh      t3, 0xCA2A(at)
+;           lh      v1, 0x4A2A(t0)
+.orga 0xBA3300
+    jal     skip_3_down_erase
+    sh      t3, 0xCA2A(at)
+
+;File 3 Position
+; Replaces: or      a0, s0, r0
+;           lh      t3, 0x4A2E(a2)
+.orga 0xBAF4F4
+    jal     move_file_3
+    or      a0, s0, r0
+
+;==================================================================================================
+; Make Twinrova Wait For Link
+;==================================================================================================
+;Hook into twinrova update function and check for links height
+; Replaces: sw      s2, 0x44(sp)
+;           sw      s0, 0x3C(sp)
+.orga 0xD68D68
+    jal     rova_check_pos
+    sw      s2, 0x44(sp)
+
+;If the height check hasnt been met yet, branch to the end of the update function
+;This freezes twinrova until the condition is met
+; Replaces: sdc1    f24, 0x30(sp)
+;           lw      s2, 0x1C44(s3)
+;           addiu   t6, r0, 0x03
+;           sb      t6, 0x05B0(s1)
+;           lbu     t7, 0x07AF(s3)
+;           mfc1    a2, f22
+;           mfc1    a3, f20
+.orga 0xD68D70
+    la      t1, START_TWINROVA_FIGHT
+    lb      t1, 0x00(t1)
+    beqz    t1, @Twinrova_Update_Return
+    lw      ra, 0x4C(sp)
+    jal     twinrova_displaced
+    sdc1    f24, 0x30(sp)
+.orga 0xD69398
+@Twinrova_Update_Return:
+
+;Remove the function call to set the boss music in Init
+; Replaces: jal     0x800CAA70
+.orga 0xD62128
+    nop
+
+;==================================================================================================
+; Fix Links Angle in Fairy Fountains
+;==================================================================================================
+
+;Hook great fairy update function and set position/angle when conditions are met
+; Replaces: or      a0, s0, r0
+;           or      a1, s1, r0
+.orga 0xC8B24C
+    jal     fountain_set_posrot
+    or      a0, s0, r0
+
+;==================================================================================================
+; Speed Up Gate in Kakariko
+;==================================================================================================
+; gate opening x
+; Replaces: lui     at, 0x4000 ;2.0f
+.orga 0xDD366C
+    lui     at, 0x40D0 ;6.5f
+
+; gate opening z
+; Replaces: lui     a2, 0x3F4C
+;           sub.s   f8, f4, f6
+;           lui     a3, 0x3E99
+;           ori     a3, a3, 0x999A
+;           ori     a2, a2, 0xCCCD
+.orga 0xDD367C
+    lui     a2, 0x4000
+    sub.s   f8, f4, f6
+    lui     a3, 0x4000
+    nop
+    nop
+
+; gate closing x
+; Replaces: lui     at, 0x4000 ;2.0f
+.orga 0xDD3744
+    lui     at, 0x40D0 ;6.5f
+
+; gate closing z
+; Replaces: lui     a2, 0x3F4C
+;           add.s   f8, f4, f6
+;           lui     a3, 0x3E99
+;           ori     a3, a3, 0x999A
+;           ori     a2, a2, 0xCCCD
+.orga 0xDD3754
+    lui     a2, 0x4000
+    add.s   f8, f4, f6
+    lui     a3, 0x4000
+    nop
+    nop
+
+;==================================================================================================
+; Prevent Carpenter Boss Softlock
+;==================================================================================================
+; Replaces: or      a1, s1, r0
+;           addiu   a2, r0, 0x22 
+.orga 0xE0EC50
+    jal     prevent_carpenter_boss_softlock
+    or      a1, s1, r0
+
+;==================================================================================================
+; Skip Song of Storms Demonstration
+;==================================================================================================
+;skip setting cutscene trigger
+; Replaces: sb      t0, 0xB9E4(at)
+.orga 0xE42AB4
+    nop
+
+;if songs as items is enabled branch directly to getting the item
+; Replaces: or      a2, a0, r0
+;           or      a3, a1, r0
+;           lui     v0, 0x0001
+;           addu    v0, v0, a3   
+.orga 0xE429DC
+    jal     sos_song_as_item
+    or      a2, a0, r0
+    bnez_a  t0, 0xE42A4C
+    nop
+
+;replace the check for dialog state 7 with a function call that hides the HUD
+; Replaces: bne     v0, at
+.orga 0xE42B78
+    jal     sos_fix_alpha
+
+;if songs as items is enabled skip showing the song staff
+; Replaces: jal     0x800DD400 ;shows song staff
+.orga 0xE42B84
+    jal     sos_staff
+
+;skip playing the song demonstration and set state to prevent slashing sword
+; Replaces: jal     0x800DD400 ;plays song demo
+.orga 0xE42C00
+    jal     sos_set_state
+
+;dont allow link to talk to the windmill guy if he is recieving an item
+; Replaces: lh      t6, 0x8A(s0)
+;           lh      t7, 0xB6(s0)
+;           lhu     t9, 0xB4AE(t9)
+;           lw      v1, 0x1C44(s1)
+.orga 0xE42C44
+    jal     sos_talk_prevention
+    lh      t6, 0x8A(s0)   ;displaced
+    bnez_a  t2, 0xE42D64
+    lw      v1, 0x1C44(s1) ;displaced
+
+;==================================================================================================
+; Fix Zelda in Final Battle
+;==================================================================================================
+;change zeldas actionFunc index from 07 to 0C
+; Replaces: addiu    t6, r0, 0x07
+.orga 0xE7CC90
+    addiu    t6, r0, 0x0C
+
+;change animation to wait anim if its not set yet
+; Replaces: beqz     a1
+;           or       a2, r0, r0
+;           lui      a1, 0x0600
+;           addiu    a1, a1, 0x6F04
+;           addiu    a3, r0, 0x0000
+.orga 0xE7D19C
+    jal      zelda_check_anim
+    lui      a1, 0x0600
+    beq_a    a1, t0, 0xE7D1B4
+    or       a2, r0, r0
+    addiu    a3, r0, 0x0000
+
+;set flag so tower collapse cs never attempts to play (tower collapse sequence on)
+; Replaces: andi     t7, t6, 0xFF7F
+.orga 0xE81128
+    ori     t7, t6, 0x0080
+
+;==================================================================================================
+; Override Links call to SkelAnime_ChangeLinkAnimDefaultStop
+;==================================================================================================
+;override the call to SkelAnime_ChangeLinkAnimDefaultStop in 80388BBC to allow for 
+;special cases when changing links animation
+; Replaces: jal      0x8008C178
+.orga 0xBCDBD8
+    jal     override_changelinkanimdefaultstop
+
+;==================================================================================================
+; Fix Royal Tombstone Cutscene
+;==================================================================================================
+;when the cutscene starts, move the grave back a bit so that the hole is not covered
+; Replaces: sw       a1, 0x44(sp)
+;           lw       t6, 0x44(sp)
+.orga 0xCF7AD4
+    jal     move_royal_tombstone
+    sw      a1, 0x44(sp)
+
+;==================================================================================================
+; Speed Up Gold Gauntlets Rock Throw
+;==================================================================================================
+;replace onepointdemo calls for the different cases so the cutscene never plays
+;for cases 0 and 4 set position so that the rock lands in the right place
+
+;case 1: light trial (breaks on impact)
+; Replaces: jal       0x8006B6FC
+.orga 0xCDF3EC
+    nop
+
+;case 0: fire trial
+; Replaces: jal       0x8006B6FC
+.orga 0xCDF404
+    nop
+
+;case 4: outside ganons castle
+; Replaces: jal       0x8006B6FC
+.orga 0xCDF420 
+    jal     heavy_block_set_switch
+
+;set links action to 7 so he can move again
+; Replaces: swc1      f4, 0x34(sp)
+;           lwc1      f6, 0x0C(s0)
+.orga 0xCDF638
+    jal     heavy_block_set_link_action
+    swc1    f4, 0x34(sp)
+
+;reduce quake timer for case 1
+;Replaces: addiu      a1, r0, 0x03E7
+.orga 0xCDF790
+    addiu      a1, r0, 0x1E
+
+;skip parts of links lifting animation
+;Replaces: sw         a1, 0x34(sp)
+;          addiu      a1, s0, 0x01A4
+.orga 0xBE1BC8
+    jal    heavy_block_shorten_anim
+    sw     a1, 0x34(sp)
+
+;slightly change rock throw trajectory to land in the right place
+;Replaces: lui        at, 0x4220
+.orga 0xBE1C98
+    lui    at, 0x4218
+
+;==================================================================================================
+; Fix B Button Icon for Minigames When Swordless
+;==================================================================================================
+;remove both checks for gSaveContext.equips.buttonItems[0] != ITEM_NONE
+;Replaces: beq      t5, t6
+.orga 0xAE4360
+    nop
+
+;for the second check, replace it with a functon that sets a flag if current B item is ITEM_NONE
+;Replaces: beq      t5, v1
+.orga 0xAE43B0
+    jal    minigames_check_b
+
+;if the swordless minigame flag is set, restore B back to blank and unset flag
+;Replaces: jal      0x8006FB50
+.orga 0xAE4BD8
+    jal    minigames_restore_b
+
+;same as above for the case where you leave bowling without ending the game
+;Replaces: jal      0x8006FB50
+.orga 0xAE4B30
+    jal    minigames_restore_b
+
+;==================================================================================================
+; Jabu Spiritual Stone Actor Override
+;==================================================================================================
+; Replaces: addiu   t8, zero, 0x0006
+;           sh      t8, 0x017C(a0)
+.orga 0xCC8594
+    jal     demo_effect_medal_init
+    addiu   t8, zero, 0x0006

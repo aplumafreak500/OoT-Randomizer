@@ -215,6 +215,7 @@ set_dungeon_knowledge:
 
     jr      ra
     nop
+;==================================================================================================
 
 ;Break free of the talon cutscene after event flag is set
 
@@ -260,6 +261,14 @@ talon_break_free:
     jr     ra
     addiu    sp, sp, 0x20
 
+;==================================================================================================
+
+PLAYED_WARP_SONG:
+.byte 0x00
+.align 4
+
+;When a warp song is played, index the list of warp entrances in Links overlay and trigger a warp manually
+;PLAYED_WARP_SONG is set so that the white fade in can be used on the other side of the warp
 warp_speedup:
 
     la     t2, 0x800FE49C ;pointer to links overlay in RAM 
@@ -278,8 +287,13 @@ warp_speedup:
     addu   t2, t1, t2 
     lh     t1, 0x0(t2) 
     sh     t1, 0x1956(t0) ;next entrance 
+    la     t4, 0x801D84A0 ;globalctx+10000
+    li     t1, 0x03
+    sb     t1, 0x1E5E(t4) ;transition fade type
     li     t1, 0x14
     sb     t1, 0x1951(t0) ;scene load flag
+    li     t1, 0x01       ;set warp flag for correct fade in
+    sb     t1, PLAYED_WARP_SONG
     la     t0, SAVE_CONTEXT
     lh     t1, 0x13D2(t0) ; Timer 2 state
     beqz   t1, @@return
@@ -292,6 +306,26 @@ warp_speedup:
     jr     ra
     nop
 
+;If PLAYED_WARP_SONG is set, override the transition fade-in type to be 03 (medium speed white)
+set_fade_in:
+    ori    at, at, 0x241C   ;displaced
+    la     t5, PLAYED_WARP_SONG
+    lb     t1, 0x00(t5)
+    beqz   t1, @@return
+    lh     t2, 0xA4(s1)     ;scene number
+    li     t3, 0x5E
+    beq    t2, t3, @@return ;dont set fade if current scene is wasteland
+    la     t4, 0x801D84A0   ;globalctx+10000
+    li     t1, 0x03
+    sb     t1, 0x1E5E(t4)   ;transition fade type
+    sb     r0, 0x00(t5)     ;clear warp song flag
+
+@@return:
+    jr     ra
+    nop
+
+;==================================================================================================
+
 ; Prevent hyrule castle guards from causing a softlock.
 guard_catch:
     la      v0, GLOBAL_CONTEXT
@@ -302,6 +336,8 @@ guard_catch:
     li      at, 0x14
     jr      ra
     sb      at, 0x1E15(v0) ; trigger load
+
+;==================================================================================================
 
 ; Allow any entrance to kak to play burning cutscene
 burning_kak:
@@ -339,6 +375,7 @@ burning_kak:
     lw      a0, 0x18(sp)
     jr      ra
     addiu   sp, sp, 0x18
+;==================================================================================================
 
 ; In ER, set the "Obtained Epona" Flag after winning Ingo's 2nd race
 ingo_race_win:
@@ -354,6 +391,8 @@ ingo_race_win:
     li      t0, 0
     jr      ra
     sw      t9, 0x0000(t7)              ; Displaced Code
+
+;==================================================================================================
 
 ; Rectify the "Getting Caught By Gerudo" entrance index if necessary, based on the age and current scene
 ; In ER, Adult should be placed at the fortress entrance when getting caught in the fortress without a hookshot, instead of being thrown in the valley
@@ -386,6 +425,191 @@ gerudo_caught_entrance:
 @@fortress_entrance:
     li      t3, 0x0129                  ; Fortress from Valley entrance index
     sh      t3, 0x1E1A(at)
+
+@@return:
+    jr      ra
+    nop
+
+;==================================================================================================
+;After Link recieves an item in a fairy fountain, fix position and angle to be as if the cutscene finished
+
+GET_ITEM_TRIGGERED:
+.byte 0x00
+.align 4
+
+fountain_set_posrot:
+    or      a1, s1, r0     ;displaced
+
+    la      t1, GET_ITEM_TRIGGERED
+    la      t2, PLAYER_ACTOR
+    lb      t3, 0x424(t2)  
+    beqz    t3, @@skip     ;dont set flag if get item is 0
+    lb      t6, 0x0(t1)    
+    bnez    t6, @@skip     ;skip setting flag if its already set
+    li      t4, 0x1
+    sb      t4, 0x0(t1)    ;set flag
+    li      t5, 0xC1A00000
+    sw      t5, 0x24(t2)   ;set x
+    li      t5, 0x41200000 
+    sw      t5, 0x28(t2)   ;set y
+    li      t5, 0xC4458000
+    sw      t5, 0x2C(t2)   ;set z
+
+@@skip:
+    beqz    t6, @@return
+    nop
+    bnez    t3, @@return
+    li      t5, 0x8000
+    sh      t5, 0xB6(t2)   ;set angle
+
+    sb      r0, 0x0(t1)    ;set flag to 0
+
+@@return:
+    jr      ra
+    nop
+
+;==================================================================================================
+SOS_ITEM_GIVEN:
+.byte 0x00
+.align 4
+
+sos_set_state:
+    la      t2, PLAYER_ACTOR
+    lw      t3, 0x66C(t2)
+    li      t4, 0xCFFFFFFF ;~30000000
+    and     t3, t3, t4
+    jr      ra
+    sw      t3, 0x66C(t2)  ;unset flag early so link can receive item asap 
+
+sos_fix_alpha:
+    addiu   sp, sp, -0x18
+    sw      ra, 0x14(sp)
+    li      a0, 0x01
+    sb      a0, SOS_ITEM_GIVEN ;set item given flag
+    jal     0x8006D8E0         ;Interface_ChangeAlpha
+    nop
+    lw      ra, 0x14(sp)
+    jr      ra
+    addiu   sp, sp, 0x18
+
+sos_staff:
+    addiu   sp, sp, -0x18
+    sw      ra, 0x14(sp)
+    lb      t0, SONGS_AS_ITEMS
+    bnez    t0, @@skip_staff
+    nop
+    jal     0x800DD400 ;show song staff
+    nop
+@@skip_staff:
+    lw      ra, 0x14(sp)
+    jr      ra
+    addiu   sp, sp, 0x18
+
+sos_song_as_item:
+    or      a3, a1, r0     ;displaced
+    lui     v0, 0x0001     ;displaced
+    lb      t0, SONGS_AS_ITEMS
+    beqz    t0, @@return
+    addu    v0, v0, a3     ;displaced
+    sw      a3, 0x1C(sp)
+@@return:
+    jr      ra
+    nop
+
+sos_talk_prevention:
+    lh      t7, 0xB6(s0)   ;displaced
+    lhu     t9, 0xB4AE(t9) ;displaced
+    la      t1, SOS_ITEM_GIVEN
+    lb      t2, 0(t1)
+    beqz    t2, @@return
+    nop
+    sb      r0, 0(t1)      ;0 out the flag after 1 frame
+@@return:
+    jr      ra
+    nop
+
+;==================================================================================================
+;move royal tombstone if draw function is null
+move_royal_tombstone:
+    lw      t6, 0x134(a0)  ;grave draw function
+    bnez    t6, @@return
+    li      t6, 0x44800000 ;new x pos
+    sw      t6, 0x24(a0)
+@@return:
+    jr      ra
+    lw      t6, 0x44(sp)
+
+;==================================================================================================
+
+heavy_block_set_switch:
+    addiu   a1, s0, 0x01A4 ;displaced
+    addiu   sp, sp, -0x20
+    sw      ra, 0x14(sp)
+    sw      a1, 0x18(sp)
+    lh      a1, 0x1C(s1)
+    sra     a1, a1, 8
+    jal     0x800204D0     ;set switch flag
+    andi    a1, a1, 0x3F
+    lw      a1, 0x18(sp)
+    lw      ra, 0x14(sp)
+    jr      ra
+    addiu   sp, sp, 0x20
+
+heavy_block_set_link_action:
+    la      t0, PLAYER_ACTOR
+    lb      t2, 0x0434(t0)
+    li      t3, 0x08
+    bne     t2, t3, @@return
+    li      t1, 0x07       ;action 7
+    sb      t1, 0x0434(t0) ;links action
+@@return:
+    jr      ra
+    lwc1    f6, 0x0C(s0)   ;displaced
+    
+heavy_block_shorten_anim:
+    la      t0, PLAYER_ACTOR
+    lw      t1, 0x01AC(t0)   ;current animation
+    li      t2, 0x04002F98   ;heavy block lift animation
+    bne     t1, t2, @@return ;return if not heavy block lift
+    lw      t3, 0x1BC(t0)    ;current animation frame 
+    li      t4, 0x42CF0000   
+    bne     t3, t4, @@check_end
+    li      t5, 0x43640000   ;228.0f
+    b       @@return
+    sw      t5, 0x1BC(t0)    ;throw block
+@@check_end:
+    li      t4, 0x43790000   ;249.0f
+    bne     t3, t4, @@return
+    li      t1, 0x803A967C
+    sw      t1, 0x664(t0)
+@@return:
+    jr      ra
+    addiu   a1, s0, 0x01A4      ;displaced
+    
+;==================================================================================================
+
+demo_effect_medal_init:
+    sh      t8, 0x17C(a0)      ; displaced code
+
+    la      t0, GLOBAL_CONTEXT
+    lh      t1, 0xA4(t0)       ; current scene
+    li      t2, 0x02
+    bne     t1, t2, @@return   ; skip overrides if scene isn't "Inside Jabu Jabu's Belly"
+
+    lw      t1, 0x138(a0)      ; pointer to actor overlay table entry
+    lw      t1, 0x10(t1)       ; actor overlay loaded ram address
+    addiu   t2, t1, 0x3398
+    sw      t2, 0x184(a0)      ; override update routine to child spritiual stone (8092E058)
+    li      t3, 1
+    sh      t3, 0x17C(a0)      ; set cutscene NPC id to child ruto
+
+    addiu   sp, sp, -0x18
+    sw      ra, 0x14(sp)
+    li      a1, 0.1
+    jal     0x80020F88         ; set actor scale to 0.1
+    nop
+    lw      ra, 0x14(sp)
+    addiu   sp, sp, 0x18
 
 @@return:
     jr      ra

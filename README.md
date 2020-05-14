@@ -17,6 +17,8 @@ Differences between this branch and the main Dev branch (on [Testrunner's Fork](
 * New Inventory/Equipment/Status Icons Display in File Select from [rlbond86's Menu Icons Branch](https://github.com/rlbond86/OoT-Randomizer/tree/menu_icons)
 * New "Shuffle Medigoron & Carpet Salesman" option to have both of these NPCs sell a randomized item once at the price of 200 Rupees.
 * The Adult Temple of Time Altar provides additional information on Rainbow Bridge requirements as well as the location of Ganon's Castle Boss Key, always available under any settings.
+* Various gameplay fixes and QoL improvements, including fast Rock/Block lifting, from [Fig's QoL Branch](https://github.com/fig02/OoT-Randomizer/tree/qol)
+* The spiritual stone visible in the Big Octo room in Jabu matches the stone/medallion reward of the dungeon.
 
 ## Index
 

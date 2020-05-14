@@ -1698,9 +1698,8 @@ setting_infos = [
         name           = 'useful_cutscenes',
         gui_text       = 'Enable Useful Cutscenes',
         gui_tooltip    = '''\
-            The cutscenes of the Poes in Forest Temple,
-            Darunia in Fire Temple, and the introduction
-            to Twinrova will not be skipped.
+            The cutscenes of the Poes in Forest Temple and
+            Darunia in Fire Temple will not be skipped.
         ''',
         shared         = True,
     ),

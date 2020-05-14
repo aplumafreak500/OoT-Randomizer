@@ -173,6 +173,9 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
                      world.distribution.song_as_items or \
                      world.starting_songs
 
+    if songs_as_items:
+        rom.write_byte(rom.sym('SONGS_AS_ITEMS'), 1)
+
     # Speed learning Zelda's Lullaby
     rom.write_int32s(0x02E8E90C, [0x000003E8, 0x00000001]) # Terminator Execution
     if songs_as_items:
@@ -427,6 +430,7 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
         rom.write_byte(0x2F5B559, 0x04)
         rom.write_byte(0x2F5B621, 0x04)
         rom.write_byte(0x2F5B761, 0x07)
+        rom.write_bytes(0x2F5B840, [0x00, 0x05, 0x00, 0x01, 0x00, 0x05, 0x00, 0x05]) #shorten white flash
 
         # Speed scene with all medallions
         rom.write_bytes(0x2512680, [0x00, 0x74, 0x00, 0x01, 0x00, 0x02, 0x00, 0x02])
@@ -969,10 +973,8 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
     save_context.write_bits(0x0F09, 0x10) # "Met Child Malon at Castle or Market"
     if not world.all_cutscenes:
         save_context.write_bits(0x0F09, 0x20) # "Child Malon Said Epona Was Scared of You"
-
         save_context.write_bits(0x0F21, 0x04) # "Ruto in JJ (M3) Talk First Time"
         save_context.write_bits(0x0F21, 0x02) # "Ruto in JJ (M2) Meet Ruto"
-
         save_context.write_bits(0x0EE2, 0x01) # "Began Ganondorf Battle"
         save_context.write_bits(0x0EE3, 0x80) # "Began Bongo Bongo Battle"
         save_context.write_bits(0x0EE3, 0x40) # "Began Barinade Battle"
@@ -984,7 +986,6 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
         save_context.write_bits(0x0EE3, 0x04) # "Began Phantom Ganon Battle"
         save_context.write_bits(0x0EE3, 0x02) # "Began King Dodongo Battle"
         save_context.write_bits(0x0EE3, 0x01) # "Began Gohma Battle"
-
         save_context.write_bits(0x0EE8, 0x01) # "Entered Deku Tree"
         save_context.write_bits(0x0EE9, 0x80) # "Entered Temple of Time"
         save_context.write_bits(0x0EE9, 0x40) # "Entered Goron City"
@@ -1696,6 +1697,15 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
         rom.write_int32s(0xEC68C0, [0x00000000, 0x00000000])
         rom.write_int32s(0xEC69B0, [0x00000000, 0x00000000])
         rom.write_int32(0xEC6A10, 0x34020002) # li v0, 2
+
+    # Set Dungeon Reward Actor in Jabu Jabu to be accurate
+    # Vanilla and MQ Jabu Jabu addresses are the same for this object and actor
+    jabu_stone_object = world.get_location('Barinade').item.special['object_id']
+    rom.write_int16(0x277D068, jabu_stone_object)
+    rom.write_int16(0x277D168, jabu_stone_object)
+    jabu_stone_type = world.get_location('Barinade').item.special['actor_type']
+    rom.write_byte(0x277D0BB, jabu_stone_type)
+    rom.write_byte(0x277D19B, jabu_stone_type)
 
     # update happy mask shop to use new SOLD OUT text id
     rom.write_int16(shop_item_file.start + 0x1726, shop_items[0x26].description_message)

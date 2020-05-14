@@ -55,7 +55,7 @@ RANDO_CONTEXT:
 .include "time_travel.asm"
 .include "song_fix.asm"
 .include "scarecrow.asm"
-.include "empty_bomb_fix.asm"
+.include "empty_bomb.asm"
 .include "initial_save.asm"
 .include "textbox.asm"
 .include "fishing.asm"
@@ -83,6 +83,12 @@ RANDO_CONTEXT:
 .include "deku_mouth_condition.asm"
 .include "audio.asm"
 .include "king_zora.asm"
+.include "carpenter_boss.asm"
+.include "twinrova_wait.asm"
+.include "file_select.asm"
+.include "zelda.asm"
+.include "link_anim.asm"
+.include "minigames.asm"
 .include "agony.asm"
 .include "horseback_archery.asm"
 .include "carpet_salesman.asm"
@@ -101,6 +107,8 @@ TRIFORCE_ICON_TEXTURE:
 .align 0x10
 PAYLOAD_END:
 .endarea //payload max memory
+
+.skip 0x100 ; Temporary address bump to avoid audio issues
 
 AUDIO_THREAD_MEM_START:
 .skip AUDIO_THREAD_MEM_SIZE

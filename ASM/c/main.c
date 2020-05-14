@@ -37,7 +37,10 @@ void after_game_state_update() {
     draw_triforce_count(&(z64_ctxt.gfx->overlay));
 }
 
+extern uint8_t START_TWINROVA_FIGHT;
+
 void after_scene_init() {
+    START_TWINROVA_FIGHT = 0;
     check_ganon_entry();
     models_reset();
     extern_scene_init();
