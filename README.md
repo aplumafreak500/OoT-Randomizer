@@ -13,7 +13,6 @@ Differences between this branch and the main Dev branch (on [Testrunner's Fork](
 * "Entrance Shuffle" (aka ER) is changed into a set of more advanced and customizable options including mixing entrance pools, decoupling entrances and randomizing overworld spawns or warp songs.
 * Picking up Gold Skulltula Tokens in non-Tokensanity displays a self-closing textbox which no longer freezes the player.
 * "Bombchus In Logic" is improved to include bombchu drops (from grass, pots, etc) that start dropping once you have found Bombchus.
-* The "Skip First Dampe Race" setting is changed to "Skip First Minigame Phases", which also applies to the Horseback Archery minigame, and allows you to get both rewards at once if you score 1500 points in a single attempt.
 * New Inventory/Equipment/Status Icons Display in File Select from [rlbond86's Menu Icons Branch](https://github.com/rlbond86/OoT-Randomizer/tree/menu_icons)
 * New "Shuffle Medigoron & Carpet Salesman" option to have both of these NPCs sell a randomized item once at the price of 200 Rupees.
 * The Adult Temple of Time Altar provides additional information on Rainbow Bridge requirements as well as the location of Ganon's Castle Boss Key, always available under any settings.
@@ -103,22 +102,31 @@ player.
 ### Dev
 
 #### New Features
+* New setting `Skip Some Minigame Phases`
+  * Allows getting both rewards for Horseback Archery and Dampé Race in a single go!
+  * Replaces the `Skip First Dampé Race` setting.
 * New cosmetic setting `HUD Button Colors`
   * The buttons shown on the HUD can be colored to match the N64 or Gamecube color scheme.
   * Or you can completely randomize all the button colors.
 * New cosmetic setting `Item Model Colors Match Cosmetics`
   * Freestanding models like heart containers, gauntlets, and heart/magic drops will match their respective color settings.
   * Tunics are not affected, in order to keep freestanding tunics recognizable.
+* New button color presets matching those from Majora's Mask.
+  * The "Random Choice" option may pick one of these.
 
 #### Bug Fixes
 * Limit Kokiri Tunic RGB values in Glitched Logic to prevent Weirdshot crashes.
 * Prevent an errant `@` from showing up in Triforce Hunt.
 * Allow playthrough to collect a second 'Bottle with Letter' as its first empty bottle.
+* Fix some issues with `Randomize Main Rules`:
+  * Closed Forest implies starting as child.
+  * Triforce Hunt won't accidentally place the Boss Key for Ganon's Castle.
 
 #### Other Changes
 * Performance improvements to seed generation.
 * Updated development n64 compilation process to use latest available toolchain.
 * Added decompressor source and updated Decompress binaries.
+* OoTRandomizer.py returns an error code on failure to interact better with user scripting.
 * Mweep.
 
 ### 5.2

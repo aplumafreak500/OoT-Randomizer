@@ -2040,23 +2040,89 @@ skip_GS_BGS_text:
 ;==================================================================================================
 ;remove both checks for gSaveContext.equips.buttonItems[0] != ITEM_NONE
 ;Replaces: beq      t5, t6
-.orga 0xAE4360
+;.orga 0xAE4360
+;    nop
+;
+;;for the second check, replace it with a functon that sets a flag if current B item is ITEM_NONE
+;;Replaces: beq      t5, v1
+;.orga 0xAE43B0
+;    jal    minigames_check_b
+;
+;;if the swordless minigame flag is set, restore B back to blank and unset flag
+;;Replaces: jal      0x8006FB50
+;.orga 0xAE4BD8
+;    jal    minigames_restore_b
+;
+;;same as above for the case where you leave bowling without ending the game
+;;Replaces: jal      0x8006FB50
+;.orga 0xAE4B30
+;    jal    minigames_restore_b
+
+;==================================================================================================
+; Skip Malons Song Demonstration
+;==================================================================================================
+;skip function call to show song demonstration
+.orga 0xD7EB4C
     nop
 
-;for the second check, replace it with a functon that sets a flag if current B item is ITEM_NONE
-;Replaces: beq      t5, v1
-.orga 0xAE43B0
-    jal    minigames_check_b
+;go straight to item function for songs as items
+;Replaces: sw     t0, 0x04(a2)
+;          sw     t1, 0x0180(a2)
+.orga 0xD7EB70
+    jal    malon_goto_item
+    sw     t0, 0x04(a2)
 
-;if the swordless minigame flag is set, restore B back to blank and unset flag
-;Replaces: jal      0x8006FB50
-.orga 0xAE4BD8
-    jal    minigames_restore_b
+;skip check for dialog state to be 7 (demonstration finished)
+.orga 0xD7EBBC
+    nop
 
-;same as above for the case where you leave bowling without ending the game
-;Replaces: jal      0x8006FB50
-.orga 0xAE4B30
-    jal    minigames_restore_b
+;check for songs as items to handle song staff
+;Replaces: jal    0x800DD400
+.orga 0xD7EBC8
+    jal    malon_handle_staff
+
+;various changes to final actionFunc before normal cutscene would start
+.orga 0xD7EBF0
+    addiu   sp, sp, -0x18 ;move stuff around to save ra
+    sw      ra, 0x14(sp)
+    jal     malon_ra_displaced
+    lw      v0, 0x1C44(a1)
+.skip 4 * 1
+    addiu  t9, r0, 0x02AE ;from malon entrance
+.skip 4 * 2
+    jal    malon_songs_as_items ;make branch fail if songs as items is on
+    lhu    t8, 0x04C6(t8)
+.skip 4 * 5
+    sh     t9, 0x02(a3) ;set entrance from cutscene
+.skip 4 * 1
+    nop        ;dont set next cutscene index
+.skip 4 * 2
+    nop        ;dont set transition fade type
+.skip 4 * 4    
+    nop        ;dont set load flag 
+.skip 4 * 2  
+    j      malon_check_give_item
+
+;set relevant flags and restore malon so she can talk again
+.orga 0xD7EC70
+    j    malon_set_wait
+
+;==================================================================================================
+; Clean Up Big Octo Room For Multiple Visits
+;==================================================================================================
+;make link drop ruto if "visited big octo" flag is set
+;Replaces: lh     t9, 0x1C(s0)
+;          lh     t6, 0x1C(s0)
+.orga 0xD4BCB0
+    jal    drop_ruto
+    lh     t9, 0x1C(s0)
+
+;kill Demo_Effect if "visited big octo" flag is set
+;Replaces: sw     a1, 0x64(sp)
+;          lh     v0, 0x1C(s0)
+.orga 0xCC85B8
+    jal    check_kill_demoeffect
+    sw     a1, 0x64(sp)
 
 ;==================================================================================================
 ; Jabu Spiritual Stone Actor Override
