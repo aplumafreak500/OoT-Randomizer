@@ -1168,6 +1168,7 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
     # skip castle guard stealth sequence
     if world.no_guard_stealth:
         # change the exit at child/day crawlspace to the end of zelda's goddess cutscene
+        # TODO: If "All Cutscenes Enabled", set this to just drop you in the courtyard
         rom.write_bytes(0x21F60DE, [0x05, 0xF0])
 
     # patch mq scenes
@@ -1570,7 +1571,7 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
     if world.shuffle_medigoron_carpet_salesman:
         rom.write_byte(rom.sym('SHUFFLE_CARPET_SALESMAN'), 0x01)
         # Update carpet salesman messages to better fit the fact that he sells a randomized item
-        update_message_by_id(messages, 0x6077, "\x06\x41Well Come!\x04I am selling stuff, strange and \x01rare, from all over the world to \x01everybody.\x01Today's special is...\x04A mysterious item! \x01Intriguing! \x01I won't tell you what it is until \x01I see the money....\x04How about \x05\x41200 Rupees\x05\x40?\x01\x01\x1B\x05\x42Buy\x01Don't buy\x05\x40\x02")
+        update_message_by_id(messages, 0x6077, "\x06\x41Welcome!\x04I am selling stuff, strange and \x01rare, from all over the world to \x01everybody.\x01Today's special is...\x04A mysterious item! \x01Intriguing! \x01I won't tell you what it is until \x01I see the money....\x04How about \x05\x41200 Rupees\x05\x40?\x01\x01\x1B\x05\x42Buy\x01Don't buy\x05\x40\x02")
         update_message_by_id(messages, 0x6078, "Thank you very much!\x04The mark that will lead you to\x01the Spirit Temple is the \x05\x41flag on\x01the left \x05\x40outside the shop.\x01Be seeing you!\x02")
 
         rom.write_byte(rom.sym('SHUFFLE_MEDIGORON'), 0x01)
