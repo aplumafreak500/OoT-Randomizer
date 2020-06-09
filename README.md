@@ -17,7 +17,6 @@ Differences between this branch and the main Dev branch (on [Testrunner's Fork](
 * New "Shuffle Medigoron & Carpet Salesman" option to have both of these NPCs sell a randomized item once at the price of 200 Rupees.
 * The Adult Temple of Time Altar provides additional information on Rainbow Bridge requirements as well as the location of Ganon's Castle Boss Key, always available under any settings.
 * Various gameplay fixes and QoL improvements, including fast Rock/Block lifting, from [Fig's QoL Branch](https://github.com/fig02/OoT-Randomizer/tree/qol)
-* The spiritual stone visible in the Big Octo room in Jabu matches the stone/medallion reward of the dungeon.
 
 ## Index
 
@@ -113,6 +112,7 @@ player.
   * Tunics are not affected, in order to keep freestanding tunics recognizable.
 * New button color presets matching those from Majora's Mask.
   * The "Random Choice" option may pick one of these.
+* Tricks can be filtered in the GUI using a new dropdown.
 
 #### Bug Fixes
 * Limit Kokiri Tunic RGB values in Glitched Logic to prevent Weirdshot crashes.
@@ -121,12 +121,17 @@ player.
 * Fix some issues with `Randomize Main Rules`:
   * Closed Forest implies starting as child.
   * Triforce Hunt won't accidentally place the Boss Key for Ganon's Castle.
+* The seed generator can now retry a few times in case of failure.
+* Minor plandomizer fixes and improvements.
 
 #### Other Changes
+* File 3 has been removed from generated ROMs to free up some space.
+* The Zora Sapphire in Jabu Jabu's Big Octo room is now the actual dungeon reward.
 * Performance improvements to seed generation.
 * Updated development n64 compilation process to use latest available toolchain.
 * Added decompressor source and updated Decompress binaries.
 * OoTRandomizer.py returns an error code on failure to interact better with user scripting.
+* Plandomizer distribution files are copied to the Output directory next to the Spoiler and Cosmetics logs.
 * Mweep.
 
 ### 5.2
