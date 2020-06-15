@@ -223,7 +223,7 @@ logic_tricks = {
                     - MQ Fire Temple Lizalfos Maze.
                     - MQ Spirit Trial.
                     '''},
-    'Bottom of the Well Basement Chest with Strength & Sticks': {
+    'Bottom of the Well Map Chest with Strength & Sticks': {
         'name'    : 'logic_botw_basement',
         'tags'    : ("Bottom of the Well",),
         'tooltip' : '''\
@@ -307,7 +307,7 @@ logic_tricks = {
                     and the wall. Through that gap you can hookshot
                     the target on the ceiling.
                     '''},
-    'Death Mountain Trail Bombable Chest with Strength': {
+    'Death Mountain Trail Chest with Strength': {
         'name'    : 'logic_dmt_bombable',
         'tags'    : ("Death Mountain Trail",),
         'tooltip' : '''\
@@ -388,7 +388,7 @@ logic_tricks = {
                     Allow the Boomerang to return to you through
                     the Song of Time block to grab the token.
                     '''},
-    'Bottom of the Well Cage GS without Boomerang': {
+    'Bottom of the Well Like Like GS without Boomerang': {
         'name'    : 'logic_botw_cage_gs',
         'tags'    : ("Bottom of the Well", "Skulltulas",),
         'tooltip' : '''\
@@ -506,7 +506,7 @@ logic_tricks = {
                     so that Link will grab the ledge from farther away than
                     is normally possible.
                     '''},
-    'Diving in the Lab without Gold Scale': {
+    'Lake Hylia Lab Dive without Gold Scale': {
         'name'    : 'logic_lab_diving',
         'tags'    : ("Lake Hylia",),
         'tooltip' : '''\
@@ -534,7 +534,7 @@ logic_tricks = {
                     You can beat the quicksand by backwalking across it
                     in a specific way.
                     '''},
-    'Desert Colossus Hill GS with Hookshot': {
+    'Colossus Hill GS with Hookshot': {
         'name'    : 'logic_colossus_gs',
         'tags'    : ("Desert Colossus", "Skulltulas",),
         'tooltip' : '''\
@@ -634,7 +634,7 @@ logic_tricks = {
                     If you stand on the very edge of the platform, this
                     Gold Skulltula can be obtained with only the Hookshot.
                     '''},
-    'Water Temple Serpent River GS without Iron Boots': {
+    'Water Temple River GS without Iron Boots': {
         'name'    : 'logic_water_river_gs',
         'tags'    : ("Water Temple", "Skulltulas",),
         'tooltip' : '''\
@@ -720,7 +720,7 @@ logic_tricks = {
                     A precise jump can be used to skip
                     pushing the block.
                     '''},
-    'Fire Temple MQ Big Lava Room Bombable Chest without Hookshot': {
+    'Fire Temple MQ Big Lava Room Blocked Door without Hookshot': {
         'name'    : 'logic_fire_mq_bombable_chest',
         'tags'    : ("Fire Temple",),
         'tooltip' : '''\
@@ -753,9 +753,8 @@ logic_tricks = {
                     Wasteland in reverse.
                     Note that jumping to the carpet merchant as child
                     requires a fairly precise jumpslash.
-                    To enable the equivalent trick for going forward
-                    through the Wasteland, set the Lens of Truth logic
-                    to "Only Chest Minigame."
+                    The equivalent trick for going forward through the
+                    Wasteland is "Lensless Wasteland".
                     To cross the river of sand with no additional items,
                     be sure to also enable "Wasteland Crossing without
                     Hover Boots or Longshot."
@@ -924,7 +923,7 @@ logic_tricks = {
                     coming into this room from above by going through
                     the serpent river.
                     '''},
-    'Goron City Leftmost Maze Chest with Hover Boots': {
+    'Goron City Maze Left Chest with Hover Boots': {
         'name'    : 'logic_goron_city_leftmost',
         'tags'    : ("Goron City",),
         'tooltip' : '''\
@@ -1070,6 +1069,100 @@ logic_tricks = {
                     open the Shadow Temple entrance with just Fire
                     Arrows, but you must be very quick, precise,
                     and strategic with how you take your shots.
+                    '''},
+    'Lensless Wasteland': {
+        'name'    : 'logic_lens_wasteland',
+        'tags'    : ("Lens of Truth","Haunted Wasteland",),
+        'tooltip' : '''\
+                    By memorizing the path, you can travel through the
+                    Wasteland without using the Lens of Truth to see
+                    the Poe.
+                    The equivalent trick for going in reverse through
+                    the Wasteland is "Reverse Wasteland".
+                    '''},
+    'Bottom of the Well without Lens of Truth': {
+        'name'    : 'logic_lens_botw',
+        'tags'    : ("Lens of Truth","Bottom of the Well",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Bottom of the Well.
+                    '''},
+    'Ganon\'s Castle MQ without Lens of Truth': {
+        'name'    : 'logic_lens_castle_mq',
+        'tags'    : ("Lens of Truth","Ganon's Castle",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Ganon's Castle MQ.
+                    '''},
+    'Ganon\'s Castle without Lens of Truth': {
+        'name'    : 'logic_lens_castle',
+        'tags'    : ("Lens of Truth","Ganon's Castle",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Ganon's Castle.
+                    '''},
+    'Gerudo Training Grounds MQ without Lens of Truth': {
+        'name'    : 'logic_lens_gtg_mq',
+        'tags'    : ("Lens of Truth","Gerudo Training Grounds",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Gerudo Training Grounds MQ.
+                    '''},
+    'Gerudo Training Grounds without Lens of Truth': {
+        'name'    : 'logic_lens_gtg',
+        'tags'    : ("Lens of Truth","Gerudo Training Grounds",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Gerudo Training Grounds.
+                    '''},
+    'Jabu MQ without Lens of Truth': {
+        'name'    : 'logic_lens_jabu_mq',
+        'tags'    : ("Lens of Truth","Jabu Jabu's Belly",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Jabu MQ.
+                    '''},
+    'Shadow Temple MQ before Huge Pit without Lens of Truth': {
+        'name'    : 'logic_lens_shadow_mq',
+        'tags'    : ("Lens of Truth","Shadow Temple",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Shadow Temple MQ before the Huge Pit room.
+                    '''},
+    'Shadow Temple MQ beyond Huge Pit without Lens of Truth': {
+        'name'    : 'logic_lens_shadow_mq_back',
+        'tags'    : ("Lens of Truth","Shadow Temple",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Shadow Temple MQ beyond the Huge Pit room.
+                    '''},
+    'Shadow Temple before Huge Pit without Lens of Truth': {
+        'name'    : 'logic_lens_shadow',
+        'tags'    : ("Lens of Truth","Shadow Temple",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Shadow Temple before the Huge Pit room.
+                    '''},
+    'Shadow Temple beyond Huge Pit without Lens of Truth': {
+        'name'    : 'logic_lens_shadow_back',
+        'tags'    : ("Lens of Truth","Shadow Temple",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Shadow Temple beyond the Huge Pit room.
+                    '''},
+    'Spirit Temple MQ without Lens of Truth': {
+        'name'    : 'logic_lens_spirit_mq',
+        'tags'    : ("Lens of Truth","Spirit Temple",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Spirit Temple MQ.
+                    '''},
+    'Spirit Temple without Lens of Truth': {
+        'name'    : 'logic_lens_spirit',
+        'tags'    : ("Lens of Truth","Spirit Temple",),
+        'tooltip' : '''\
+                    Removes the requirements for the Lens of Truth
+                    in Spirit Temple.
                     '''},
 }
 
@@ -2640,27 +2733,6 @@ setting_infos = [
         ''',
         shared         = True,
     ),
-    Combobox(
-        name           = 'logic_lens',
-        gui_text       = 'Lens of Truth',
-        default        = 'all',
-        choices        = {
-            'all':             'Required Everywhere',
-            'chest-wasteland': 'Wasteland and Chest Minigame',
-            'chest':           'Only Chest Minigame',
-        },
-        gui_tooltip    = '''\
-            'Required everywhere': every invisible or
-            fake object will expect you to have the
-            Lens of Truth and Magic. The exception is
-            passing through the first wall in Bottom of
-            the Well, since that is required in vanilla.
-
-            'Wasteland': The lens is needed to follow
-            the ghost guide across the Haunted Wasteland.
-        ''',
-        shared         = True,
-    ),
     Setting_Info(
         name           = 'starting_equipment',
         type           = list,
@@ -2690,8 +2762,8 @@ setting_infos = [
             Selecting multiple progressive items will give
             the appropriate number of upgrades.
             
-            If playing with Open Zora Fountain, the Bottle
-            with Letter is converted to a regular Bottle.
+            If playing with Open Zora Fountain, the Ruto's Letter
+            is converted to a regular Bottle.
         ''',
     ),
     Setting_Info(
