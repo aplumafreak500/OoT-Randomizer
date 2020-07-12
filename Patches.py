@@ -158,8 +158,6 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
         rom.write_bytes(0x290E08E, [0x05, 0xF0])
         rom.write_byte(0xEFCBA7, 0x08)
         rom.write_byte(0xEFE7C7, 0x05)
-        #rom.write_byte(0xEFEAF7, 0x08)
-        #rom.write_byte(0xEFE7C7, 0x05)
         rom.write_bytes(0xEFE938, [0x00, 0x00, 0x00, 0x00])
         rom.write_bytes(0xEFE948, [0x00, 0x00, 0x00, 0x00])
         rom.write_bytes(0xEFE950, [0x00, 0x00, 0x00, 0x00])
@@ -401,17 +399,20 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
     # Speed scene after Forest Temple
     rom.write_bytes(0xD4ED68, [0x00, 0x45, 0x00, 0x3B, 0x00, 0x3C, 0x00, 0x3C])
     rom.write_bytes(0xD4ED78, [0x00, 0x3E, 0x00, 0x00, 0x00, 0x3A, 0x00, 0x00])
-    rom.write_bytes(0x207B9D4, [0xFF, 0xFF, 0xFF, 0xFF])
+    if not world.all_cutscenes:
+        rom.write_bytes(0x207B9D4, [0xFF, 0xFF, 0xFF, 0xFF])
 
     # Speed scene after Fire Temple
-    rom.write_bytes(0x2001848, [0x00, 0x1E, 0x00, 0x01, 0x00, 0x02, 0x00, 0x02])
     rom.write_bytes(0xD100B4, [0x00, 0x62, 0x00, 0x3B, 0x00, 0x3C, 0x00, 0x3C])
     rom.write_bytes(0xD10134, [0x00, 0x3C, 0x00, 0x00, 0x00, 0x3A, 0x00, 0x00])
+    if not world.all_cutscenes:
+        rom.write_bytes(0x2001848, [0x00, 0x1E, 0x00, 0x01, 0x00, 0x02, 0x00, 0x02])
 
     # Speed scene after Water Temple
     rom.write_bytes(0xD5A458, [0x00, 0x15, 0x00, 0x3B, 0x00, 0x3C, 0x00, 0x3C])
     rom.write_bytes(0xD5A3A8, [0x00, 0x3D, 0x00, 0x00, 0x00, 0x3A, 0x00, 0x00])
-    rom.write_bytes(0x20D0D20, [0x00, 0x29, 0x00, 0xC7, 0x00, 0xC8, 0x00, 0xC8])
+    if not world.all_cutscenes:
+        rom.write_bytes(0x20D0D20, [0x00, 0x29, 0x00, 0xC7, 0x00, 0xC8, 0x00, 0xC8])
 
     # Speed scene after Shadow Temple
     rom.write_bytes(0xD13EC8, [0x00, 0x61, 0x00, 0x3B, 0x00, 0x3C, 0x00, 0x3C])
@@ -588,7 +589,7 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
         rom.write_byte(0x2025159, 0x02)
         rom.write_byte(0x2023E19, 0x02)
 
-    #Speed opening of Door of Time
+    # Speed opening of Door of Time
 
     # We always do this because the door doesn't open when warping in via Prelude
     # We always want to allow this (especially in ER)
@@ -912,10 +913,10 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
 
     # Fix text for Pocket Cucco.
     rom.write_byte(0xBEEF45, 0x0B)
-        
+
     # Fix stupid alcove cameras in Ice Cavern -- thanks to krim and mzx for the help
     rom.write_byte(0x2BECA25,0x01);
-    rom.write_byte(0x2BECA2D,0x01); 
+    rom.write_byte(0x2BECA2D,0x01);
 
     configure_dungeon_info(rom, world)
 
@@ -1010,7 +1011,7 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
 
     # Set the number of chickens to collect
     rom.write_byte(0x00E1E523, world.chicken_count)
-    
+
     # Change Anju to always say how many chickens are needed
     # Does not affect text for collecting item or afterwards
     rom.write_int16(0x00E1F3C2, 0x5036)
@@ -1168,8 +1169,10 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
     # skip castle guard stealth sequence
     if world.no_guard_stealth:
         # change the exit at child/day crawlspace to the end of zelda's goddess cutscene
-        # TODO: If "All Cutscenes Enabled", set this to just drop you in the courtyard
-        rom.write_bytes(0x21F60DE, [0x05, 0xF0])
+        if world.all_cutscenes:
+            rom.write_bytes(0x21F60DE, [0x04, 0x00])
+        else:
+            rom.write_bytes(0x21F60DE, [0x05, 0xF0])
 
     # patch mq scenes
     mq_scenes = []
