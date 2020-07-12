@@ -1,0 +1,6 @@
+[submodule "Decompress/src"]
+	path = Decompress/src
+	url = https://github.com/CMuncey/OoT_Decompressor
+[submodule "Compress/src"]
+	path = Compress/src
+	url = https://github.com/CMuncey/Zelda64_Compressor
