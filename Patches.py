@@ -150,7 +150,7 @@ def patch_rom(spoiler:Spoiler, world:World, rom:Rom):
 
 	# Undo intro CS skip
         # TODO: Does this work when shuffling your spawn point?
-        if not world.spawn_positions: # Err on the side of caution.
+        if not (world.spawn_positions or world.starting_age == 'adult'): # Err on the side of caution.
             rom.write_int16(0xB06BBA, 0xFFF1)
 
     if not world.all_cutscenes:
