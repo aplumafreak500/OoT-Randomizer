@@ -97,7 +97,7 @@ def getRequiredHints(world):
 # Hints required under certain settings
 conditional_always = {
     'Market 10 Big Poes':           lambda world: world.big_poe_count > 3,
-    'Deku Theater Skull Mask':      lambda world: world.hint_dist == 'tournament' and world.open_kakariko == 'closed' and not world.complete_mask_quest,
+    'Deku Theater Skull Mask':      lambda world: world.hint_dist in ('tournament_s3', 'tournament') and world.open_kakariko == 'closed' and not world.complete_mask_quest,
     'Deku Theater Mask of Truth':   lambda world: not world.complete_mask_quest,
     'Song from Ocarina of Time':    lambda world: world.bridge not in ('stones', 'dungeons') and world.shuffle_ganon_bosskey not in ('lacs_stones', 'lacs_dungeons'),
     'HF Ocarina of Time Item':      lambda world: world.bridge not in ('stones', 'dungeons') and world.shuffle_ganon_bosskey not in ('lacs_stones', 'lacs_dungeons'),
@@ -1174,6 +1174,8 @@ hintTable = {
 
     'ganonBK_dungeon':                                          ("hidden somewhere #inside its castle#", None, 'ganonBossKey'),
     'ganonBK_vanilla':                                          ("kept in a big chest #inside its tower#", None, 'ganonBossKey'),
+    'ganonBK_overworld':                                        ("hidden outside of dungeons #in Hyrule#", None, 'ganonBossKey'),
+    'ganonBK_dungeons':                                         ("hidden inside a dungeon #in Hyrule#", None, 'ganonBossKey'),
     'ganonBK_keysanity':                                        ("hidden somewhere #in Hyrule#", None, 'ganonBossKey'),
     'ganonBK_triforce':                                         ("given to the Hero once the #Triforce# is completed", None, 'ganonBossKey'),
 
@@ -1183,7 +1185,7 @@ hintTable = {
     'lacs_dungeons':                                            ("all Spiritual Stones and Medallions", None, 'lacs'),
 
     'Spiritual Stone Text Start':                               ("3 Spiritual Stones found in Hyrule...", None, 'altar'),
-    'Child Altar Text End':                                     ("\x13\x08Ye who may become a Hero...&Stand with the Ocarina and&play the Song of Time.", None, 'altar'),
+    'Child Altar Text End':                                     ("\x13\x07Ye who may become a Hero...&Stand with the Ocarina and&play the Song of Time.", None, 'altar'),
     'Adult Altar Text Start':                                   ("When evil rules all, an awakening&voice from the Sacred Realm will&call those destined to be Sages,&who dwell in the \x05\x41five temples\x05\x40.", None, 'altar'),
 
     'Validation Line':                                          ("Hmph... Since you made it this far,&I'll let you know what glorious&prize of Ganon's you likely&missed out on in my tower.^Behold...^", None, 'validation line'),

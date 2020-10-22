@@ -37,6 +37,7 @@ class World(object):
         self.maximum_wallets = 0
         self.light_arrow_location = None
         self.triforce_count = 0
+        self.bingosync_url = None
 
         self.parser = Rule_AST_Transformer(self)
         self.event_items = set()
@@ -48,7 +49,7 @@ class World(object):
         self.distribution = settings.distribution.world_dists[id]
 
         # rename a few attributes...
-        self.keysanity = self.shuffle_smallkeys in ['keysanity', 'remove']
+        self.keysanity = self.shuffle_smallkeys in ['keysanity', 'remove', 'dungeons', 'overworld']
         self.check_beatable_only = not self.all_reachable
 
         self.shuffle_special_interior_entrances = self.shuffle_interior_entrances == 'all'
@@ -523,13 +524,13 @@ class World(object):
     # get a list of items that don't have to be in their proper dungeon
     def get_unrestricted_dungeon_items(self):
         itempool = []
-        if self.shuffle_mapcompass == 'keysanity':
+        if self.shuffle_mapcompass in ['dungeons', 'overworld', 'keysanity']:
             itempool.extend([item for dungeon in self.dungeons for item in dungeon.dungeon_items])
-        if self.shuffle_smallkeys == 'keysanity':
+        if self.shuffle_smallkeys in ['dungeons', 'overworld', 'keysanity']:
             itempool.extend([item for dungeon in self.dungeons for item in dungeon.small_keys])
-        if self.shuffle_bosskeys == 'keysanity':
+        if self.shuffle_bosskeys in ['dungeons', 'overworld', 'keysanity']:
             itempool.extend([item for dungeon in self.dungeons if dungeon.name != 'Ganons Castle' for item in dungeon.boss_key])
-        if self.shuffle_ganon_bosskey == 'keysanity':
+        if self.shuffle_ganon_bosskey in ['dungeons', 'overworld', 'keysanity']:
             itempool.extend([item for dungeon in self.dungeons if dungeon.name == 'Ganons Castle' for item in dungeon.boss_key])
 
         for item in itempool:
