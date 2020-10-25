@@ -1761,6 +1761,9 @@ setting_infos = [
             allowing access to Gerudo Training Grounds.
         ''',
         shared         = True,
+        disable        = {
+            'open' : {'settings' : ['shuffle_fortresskeys']}
+        },
         gui_params     = {
             'randomize_key': 'randomize_settings',
         },
@@ -2597,13 +2600,13 @@ setting_infos = [
         gui_text       = 'Maps & Compasses',
         default        = 'dungeon',
         choices        = {
-            'remove':    'Remove',
-            'startwith': 'Start With',
-            'vanilla':   'Vanilla Locations',
-            'dungeon':   'Dungeon Only',
-            'overworld': 'Overworld Only',
-            'dungeons':  'Any Dungeon',
-            'keysanity': 'Anywhere',
+            'remove':      'Remove',
+            'startwith':   'Start With',
+            'vanilla':     'Vanilla Locations',
+            'dungeon':     'Dungeon Only',
+            'overworld':   'Overworld Only',
+            'any_dungeon': 'Any Dungeon',
+            'keysanity':   'Anywhere',
         },
         gui_tooltip    = '''\
             'Remove': Maps and Compasses are removed.
@@ -2644,12 +2647,12 @@ setting_infos = [
         gui_text       = 'Small Keys',
         default        = 'dungeon',
         choices        = {
-            'remove':    'Remove (Keysy)',
-            'vanilla':   'Vanilla Locations',
-            'dungeon':   'Dungeon Only',
-            'overworld': 'Overworld Only (Keysanity)',
-            'dungeons':  'Any Dungeon (Keysanity)',
-            'keysanity': 'Anywhere (Keysanity)',
+            'remove':      'Remove (Keysy)',
+            'vanilla':     'Vanilla Locations',
+            'dungeon':     'Dungeon Only',
+            'overworld':   'Overworld Only',
+            'any_dungeon': 'Any Dungeon',
+            'keysanity':   'Anywhere (Keysanity)',
         },
         gui_tooltip    = '''\
             'Remove': Small Keys are removed. All locked
@@ -2686,6 +2689,39 @@ setting_infos = [
             'Small Keys: Dungeon' + 'Boss Keys: Anywhere'
             for a milder Keysanity experience.
         ''',
+        disable        = {
+            'dungeons': {'settings': ['one_item_per_dungeon']},
+        },
+        shared         = True,
+        gui_params     = {
+            'randomize_key': 'randomize_settings',
+        },
+    ),
+    Combobox(
+        name           = 'shuffle_fortresskeys',
+        gui_text       = 'Gerudo Fortress Keys',
+        default        = 'vanilla',
+        disabled_default = 'remove',
+        choices        = {
+            'vanilla':     'Vanilla Locations',
+            'overworld':   'Overworld Only',
+            'any_dungeon': 'Any Dungeon',
+            'keysanity':   'Anywhere (Keysanity)',
+        },
+        gui_tooltip    = '''\
+            'Vanilla': Gerudo Fortress Keys will appear in their
+            vanilla location, dropping from fighting Gerudo guards
+            that attack when trying to free the jailed carpenters.
+            
+            'Overworld Only': Gerudo Fortress Keys can only appear
+             outside of dungeons.
+            
+            'Dungeons Only': Gerudo Fortress Keys can only appear
+             inside of dungeons.
+
+            'Anywhere': Gerudo Fortress Keys can appear anywhere
+            in the world.
+        ''',
         shared         = True,
         gui_params     = {
             'randomize_key': 'randomize_settings',
@@ -2696,12 +2732,12 @@ setting_infos = [
         gui_text       = 'Boss Keys',
         default        = 'dungeon',
         choices        = {
-            'remove':    'Remove (Keysy)',
-            'vanilla':   'Vanilla Locations',
-            'dungeon':   'Dungeon Only',
-            'overworld': 'Overworld Only (Keysanity)',
-            'dungeons':  'Any Dungeon (Keysanity)',
-            'keysanity': 'Anywhere (Keysanity)',
+            'remove':      'Remove (Keysy)',
+            'vanilla':     'Vanilla Locations',
+            'dungeon':     'Dungeon Only',
+            'overworld':   'Overworld Only',
+            'any_dungeon': 'Any Dungeon',
+            'keysanity':   'Anywhere (Keysanity)',
         },
         gui_tooltip    = '''\
             'Remove': Boss Keys are removed. All locked
@@ -2748,8 +2784,8 @@ setting_infos = [
             'remove':          "Remove (Keysy)",
             'vanilla':         "Vanilla Location",
             'dungeon':         "Dungeon Only",
-            'overworld':       "Overworld Only (Keysanity)",
-            'dungeons':        "Any Dungeon (Keysanity)",
+            'overworld':       "Overworld Only",
+            'any_dungeon':     "Any Dungeon",
             'keysanity':       "Anywhere (Keysanity)",
             'lacs_vanilla':    "On LACS: Vanilla",
             'lacs_medallions': "On LACS: Medallions",
