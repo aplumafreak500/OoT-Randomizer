@@ -58,11 +58,11 @@ class World(object):
         self.entrance_shuffle = self.shuffle_interior_entrances or self.shuffle_grotto_entrances or self.shuffle_dungeon_entrances or \
                                 self.shuffle_overworld_entrances or self.owl_drops or self.warp_songs or self.spawn_positions
 
-        self.ensure_tod_access = self.shuffle_interior_entrances or self.shuffle_overworld_entrances
+        self.ensure_tod_access = self.shuffle_interior_entrances or self.shuffle_overworld_entrances or self.spawn_positions
         self.disable_trade_revert = self.shuffle_interior_entrances or self.shuffle_overworld_entrances or self.warp_songs
 
         if self.open_forest == 'closed' and (self.shuffle_special_interior_entrances or self.shuffle_overworld_entrances or 
-                                             self.warp_songs or self.spawn_positions or self.decouple_entrances or self.mix_entrance_pools):
+                                             self.warp_songs or self.spawn_positions or self.decouple_entrances or (self.mix_entrance_pools != 'off')):
             self.open_forest = 'closed_deku'
 
         self.triforce_goal = self.triforce_goal_per_world * settings.world_count
@@ -79,6 +79,8 @@ class World(object):
             self.lacs_condition = 'dungeons'
         elif self.shuffle_ganon_bosskey == 'lacs_stones':
             self.lacs_condition = 'stones'
+        elif self.shuffle_ganon_bosskey == 'lacs_tokens':
+            self.lacs_condition = 'tokens'
         else:
             self.lacs_condition = 'vanilla'
 
@@ -140,6 +142,9 @@ class World(object):
         
         self.added_hint_types = {}
         self.item_added_hint_types = {}
+        self.hint_exclusions = set()
+        if self.skip_child_zelda or settings.skip_child_zelda:
+            self.hint_exclusions.add('Song from Impa')
         self.hint_type_overrides = {}
         self.item_hint_type_overrides = {}
         for dist in hint_dist_keys:
@@ -180,11 +185,13 @@ class World(object):
         }
         max_tokens = 0
         if self.bridge == 'tokens':
-            max_tokens = self.bridge_tokens
+            max_tokens = max(max_tokens, self.bridge_tokens)
+        if self.lacs_condition == 'tokens':
+            max_tokens = max(max_tokens, self.lacs_tokens)
         tokens = [50, 40, 30, 20, 10]
         for t in tokens:
-            if t > max_tokens and f'{t} Gold Skulltula Reward' not in self.disabled_locations:
-                max_tokens = t
+            if f'{t} Gold Skulltula Reward' not in self.disabled_locations:
+                max_tokens = max(max_tokens, t)
         self.max_progressions['Gold Skulltula Token'] = max_tokens
         # Additional Ruto's Letter become Bottle, so we may have to collect two.
         self.max_progressions['Rutos Letter'] = 2
@@ -615,6 +622,7 @@ class World(object):
             # So barren hints do not include these dungeon rewards.
             if location_hint in excluded_areas or \
                location.locked or \
+               location.name in self.hint_exclusions or \
                location.item is None or \
                location.item.type in ('Event', 'DungeonReward'):
                 continue

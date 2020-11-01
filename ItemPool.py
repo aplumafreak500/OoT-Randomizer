@@ -680,6 +680,7 @@ remove_junk_items = [
     'Deku Seeds (30)',
     'Ice Trap',
 ]
+remove_junk_set = set(remove_junk_items)
 
 
 item_groups = {
@@ -817,7 +818,9 @@ def get_pool_core(world):
     elif world.item_pool_value == 'plentiful':
         ruto_bottles += 1
 
-    if world.shuffle_weird_egg:
+    if world.skip_child_zelda:
+        placed_items['HC Malon Egg'] = 'Recovery Heart'
+    elif world.shuffle_weird_egg:
         pool.append('Weird Egg')
     else:
         placed_items['HC Malon Egg'] = 'Weird Egg'
@@ -1298,7 +1301,7 @@ def get_pool_core(world):
         triforce_count = int((TriforceCounts[world.item_pool_value] * world.triforce_goal_per_world).to_integral_value(rounding=ROUND_HALF_UP))
         pending_junk_pool.extend(['Triforce Piece'] * triforce_count)
 
-    if world.shuffle_ganon_bosskey in ['lacs_vanilla', 'lacs_medallions', 'lacs_stones', 'lacs_dungeons']:
+    if world.shuffle_ganon_bosskey in ['lacs_vanilla', 'lacs_medallions', 'lacs_stones', 'lacs_dungeons', 'lacs_tokens']:
         placed_items['ToT Light Arrows Cutscene'] = 'Boss Key (Ganons Castle)'
     elif world.shuffle_ganon_bosskey == 'vanilla':
         placed_items['Ganons Tower Boss Key Chest'] = 'Boss Key (Ganons Castle)'
@@ -1336,6 +1339,7 @@ def get_pool_core(world):
                         pending_junk_pool.remove(item)
 
         remove_junk_pool, _ = zip(*junk_pool_base)
+        # Omits Rupees (200) and Deku Nuts (10)
         remove_junk_pool = list(remove_junk_pool) + ['Recovery Heart', 'Bombs (20)', 'Arrows (30)', 'Ice Trap']
 
         junk_candidates = [item for item in pool if item in remove_junk_pool]

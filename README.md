@@ -8,16 +8,11 @@ Instead, you can open an issue on this fork [here](https://github.com/aplumafrea
 
 Differences between this branch and the main Dev branch (on [Testrunner's Fork](https://github.com/TestRunnerSRL/OoT-Randomizer/tree/Dev)):
 * Various GUI tweaks and improvements along with setting tooltip/option changes
-* HUD Button colors can be set or randomized separately for the A, B, C and Start buttons and have more available options.
-* "Entrance Shuffle" (aka ER) is changed into a set of more advanced and customizable options including mixing entrance pools, decoupling entrances and randomizing overworld spawns or warp songs.
+* 2 new advanced ER settings: "Mixed Entrance Pools" and "Decouple Entrances"
 * Picking up Gold Skulltula Tokens in non-Tokensanity displays a self-closing textbox which no longer freezes the player.
 * "Bombchus In Logic" is improved to include bombchu drops (from grass, pots, etc) that start dropping once you have found Bombchus.
 * New Inventory/Equipment/Status Icons Display in File Select from [rlbond86's Menu Icons Branch](https://github.com/rlbond86/OoT-Randomizer/tree/menu_icons)
-* The Adult Temple of Time Altar provides additional information on Rainbow Bridge requirements as well as the location of Ganon's Castle Boss Key, always available under any settings.
-* Various gameplay fixes and QoL improvements, including fast Rock/Block lifting, from [Fig's QoL Branch](https://github.com/fig02/OoT-Randomizer/tree/qol)
 * Most cutscenes are able to be toggled back on for the purposes of Text Shuffle (or for more "vanilla" behavior.)
-* Many new Cosmetic color options, including Rainbow Navi, Boomerang/Bombchu trails and Mirror Shield frame
-* New Keysanity Overworld/Dungeons Variants from [Cuphat's Keysanity Overworld Dungeon Branch](https://github.com/Cuphat/OoT-Randomizer/tree/keysanity_overworld_dungeons)
 
 ## Index
 
@@ -34,8 +29,8 @@ Differences between this branch and the main Dev branch (on [Testrunner's Fork](
 
 ## Installation
 
-Run ```Gui.py``` for a graphical interface or ```OoTRandomizer.py``` for the command line version.
-They both require Python 3.6+. This will be fully featured,
+To run this program, clone this repository and either run ```Gui.py``` for a graphical interface or ```OoTRandomizer.py```
+for the command line version. They both require Python 3.6+. This will be fully featured,
 but the seeds you generate will have different random factors than the bundled release.
 To use the GUI, [NodeJS](https://nodejs.org/en/download/) (v12, with npm) will additionally need to be installed.
 The first time ```Gui.py``` is run it will need to install necessary components, which could take a few minutes. Subsequent instances will run much quicker.
@@ -103,11 +98,9 @@ issue. You should always Hard Reset to avoid this issue entirely.
 * Versions older than 2.4 of Project64 have known compatablity issues with OoTR. To avoid this either 
 [update to v2.4 and follow the rest of our PJ64 guide](https://wiki.ootrandomizer.com/index.php?title=Project64) or change to one of our other two supported emulators.
 * Executing the collection delay glitch on various NPCs may have unpredictable and undesirable consequences.
-In particular, there is a risk of softlocking when giving the Poacher's Saw to the carpenter and mashing through the text with B.
 * Saving and quitting on the very first frame after becoming an adult when you would trigger the Light Arrow cutscene can have undesired consequences. Just don't
 do that.
-* This randomizer is based on the 1.0 version of _Ocarina of Time_, so some of its specific bugs remain. Some of these like "empty bomb" can be disadvantageous to the
-player.
+* This randomizer is based on the 1.0 version of _Ocarina of Time_, so some of its specific bugs remain.
 
 ## Changelog
 
@@ -123,28 +116,57 @@ player.
   * Shadow Temples are split into two separate areas for these tricks.
   * Glitchless logic now requires Lens (or an appropriate trick) for some checks, particularly in Shadow Temple.
   * Glitched logic may sometimes assume you can do something without lens regardless of trick settings.
+* Updated setting `Shuffle Songs`
+  * This now allows selecting from three options: shuffling in **song** locations (previously 'off'), shuffling in **anywhere** (previously 'on'), and shuffling in **dungeon** reward locations (new).
+  * The dungeon reward locations are: the 9 boss heart containers, the Lens of Truth chest (BotW), the Ice Arrows chest (GTG), the song reward in Ice Cavern, and the song from Impa in Hyrule Castle.
+  * In multiworld, as before, only the "anywhere" setting will allow songs to be placed in other players' worlds.
 * New setting `Kakariko Gate`
   * Allows configuring how the Kakariko Gate and the Happy Mask Shop will open.
   * Default (vanilla) behavior requires showing Zelda's Letter to the guard to open the gate and the shop.
   * You can configure the gate to be always open or to open automatically upon obtaining the Letter. Both of these options will also open the Happy Mask Shop upon obtaining the Letter.
 * New setting `Complete Mask Quest`
   * Marks all the mask sales complete so that the shop has all masks available to borrow as soon as it opens.
-* Updated setting `Shuffle Songs`
-  * This now allows selecting from three options: shuffling in **song** locations (previously 'off'), shuffling in **anywhere** (previously 'on'), and shuffling in **dungeon** reward locations (new).
-  * The dungeon reward locations are: the 9 boss heart containers, the Lens of Truth chest (BotW), the Ice Arrows chest (GTG), the song reward in Ice Cavern, and the song from Impa in Hyrule Castle.
-  * In multiworld, as before, only the "anywhere" setting will allow songs to be placed in other players' worlds.
-* New options for Key Shuffle settings
-  * "Overworld Only" will place keys outside of dungeons.
-  * "Any Dungeon" will allow keys to placed in any dungeon, not just the dungeon the keys belong to!
+* New setting `Skip Child Zelda`
+  * Skips the Hyrule Castle visit as child, returning Malon and Talon to Lon Lon Ranch and granting Zelda's Letter and the song that Impa provides at the start of the game.
+  * Depending on the `Kakariko Gate` and `Complete Mask Quest` settings, may also start with the gate and shop open and masks available.
+  * Removes the Weird Egg (and prevents `Shuffle Weird Egg`).
+* New options for Key and Map/Compass Shuffle settings
+  * "Overworld Only" will place keys (or maps/compasses) outside of dungeons.
+  * "Any Dungeon" will allow keys (or maps/compasses) to placed in any dungeon, not just the dungeon they belong to!
   * Gerudo Fortress Small Keys are configured in a separate setting.
 * New setting `Shuffle Medigoron & Carpet Salesman`
   * Adds the Giant's Knife and a pack of Bombchus to the pool while Medigoron and Carpet Salesman each sell a randomly placed item once for 200 rupees.
-* New cosmetic setting `HUD Button Colors`
-  * The buttons shown on the HUD can be colored to match the N64 or Gamecube color scheme, of OoT or MM.
-  * Or you can randomize the button color scheme. (We'll try to keep the button text readable.)
+* New options for Rainbow Bridge and Ganon's Boss Key on Light Arrows Cut Scene.
+  * Sliders allow customizing the exact number of stones/medallions/dungeons/tokens required.
+  * Ganon's BK on LACS can now be set to require Gold Skulltula Tokens.
+  * `Randomize Main Rules` won't randomize slider values.
+  * Conditional-always hints check for whether 2 or more dungeon rewards are required, as a backstop.
+* Entrance Randomizer settings overhaul
+  * `Entrance Shuffle` setting replaced with the other independent settings here.
+  * `Shuffle Interior Entrances`: allows a choice of shuffling simple interiors, all interiors, or none.
+  * `Shuffle Grotto Entrances`: allows shuffling grotto/grave entrances.
+  * `Shuffle Dungeon Entrances`: allows shuffling dungeon entrances.
+  * `Shuffle Overworld Entrances`: allows shuffling overworld connections.
+  * `Randomize Owl Drops`: allows randomizing where the owl drops you from each owl spot.
+  * `Randomize Warp Song Destinations`: allows randomizing (to any entrance, not just warp pads!) where each warp song takes you.
+  * `Randomize Overworld Spawns`: allows randomizing (per age) where you start when loading a save in the Overworld.
+  * All these shuffles and randomizations are fixed when the seed is generated; within a seed it will always be the same each time.
+* New setting `Fast Bunny Hood`
+  * Allows manual toggling on/off of the 1.5x speed boost from MM.
+* New Cosmetic Plandomizer
+  * Use a JSON file to set your cosmetics and sound settings.
+  * We've added lots of new color options to pick from as well!
+* New cosmetic settings for HUD button colors
+  * These can all be set independently, defaulting to the N64 colors.
 * New cosmetic setting `Item Model Colors Match Cosmetics`
   * Freestanding models like heart containers, gauntlets, and heart/magic drops will match their respective color settings.
   * Tunics are not affected, in order to keep freestanding tunics recognizable.
+* Navi Colors section renamed "Misc. Colors"
+  * Navi and sword trails options are now in this section, along with:
+  * New "Rainbow" option in all Navi color settings.
+  * New Boomerang trail inner & outer color settings, including a "Rainbow" option.
+  * New Bombchu trail inner & outer color settings, including a "Rainbow" option.
+  * New Mirror Shield Frame color setting.
 * New tricks
   * `Dodongo's Cavern Vines GS from Below with Longshot` - use the Longshot to avoid the staircase.
   * `Forest Temple First Room GS with Difficult-to-Use Weapons` - use a sword or Deku Sticks to jumpslash, or Bombs as child.
@@ -181,6 +203,13 @@ player.
   * Number of unique hints of each type are now (not counting seed-dependent hint types like 'always' and 'trial'): 4 WotH, 0 barren, 4(remainder) sometimes.
 * Added options to `Background Music` and `Fanfares` for randomly selecting only from [custom music](https://wiki.ootrandomizer.com/index.php?title=Readme#Custom_Music_and_Fanfares).
 * Tricks can be filtered in the GUI using a new dropdown.
+* Various Quality of Life improvements
+  * Speed up boulder lifting
+  * Speed up Gold Gauntlet boulder lifting
+  * Speed up learning Windmill song 
+  * Speed up learning Malons song
+  * Speed up Kakariko gate opening and closing
+  * Twinrova waits for player to reach the top platform before starting, preventing early snipes
 
 #### Bug Fixes
 * Bunny Hood speed bonus now applies correctly in cases other than child running at full speed.
@@ -188,7 +217,16 @@ player.
 * Ensure Ice Traps have valid models if they can be seen.
 * Limit Kokiri Tunic RGB values in Glitched Logic to prevent Weirdshot crashes.
 * Prevent Gerudo guards from throwing child Link in jail.
+* Fix hints not being readable on Mask of Truth setting.
+* Prevent Collection Delay from the Carpenter Boss when mashing through the text with an item in hand.
+* Gray note songs do not play back when learning them, adding consistency and preventing Sun's Song from causing bugs.
+* Empty Bomb fix improved to work in all scenarios.
+* Fast warp song hack now sets transition to white fade for consistency.
+* Royal Family Tomb moves out of the way instantly.
+* Fix Zelda from being frozen at the start of the final battle.
+* Drop Ruto before entering Big Octo room if the miniboss has been defeated.
 * Prevent an errant `@` from showing up in Triforce Hunt.
+* Move the Stone of Agony indicator above any small keys if both are present.
 * Allow playthrough to collect a second 'Bottle with Letter' as its first empty bottle.
 * Fix some issues with `Randomize Main Rules`:
   * Closed Forest implies starting as child.
@@ -203,6 +241,7 @@ player.
 #### Other Changes
 * Most locations and a few items have been renamed to improve spoiler output and standardize.
   * This will break settings and distribution files from previous versions that reference these locations and items.
+* Default for `Shuffle Weird Egg` is now off.
 * In-game hints overhaul.
 * File 3 has been removed from generated ROMs to free up some space.
 * The Zora Sapphire in Jabu Jabu's Big Octo room is now the actual dungeon reward.
@@ -356,7 +395,7 @@ player.
 * Cucco Count
   * The number of cuccos to be gathered for Anju can be reduced or randomized, and Anju will tell you in-game the target number to catch (similar to 10 Big Poes).
 * Enable Useful Cutscenes prevents some useful cutscenes from being skipped
-  * Re-enables Poes at Forest Temple, Darunia at Fire Temple, and Twinrova at Spirit Temple
+  * Re-enables Poes at Forest Temple and Darunia at Fire Temple
 
 #### Major Changes
 * Seeds generation is significantly faster

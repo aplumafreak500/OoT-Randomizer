@@ -315,11 +315,11 @@ def get_hint_area(spot):
 def get_woth_hint(spoiler, world, checked):
     locations = spoiler.required_locations[world.id]
     locations = list(filter(lambda location:
-        location.name not in checked and \
-        not (world.woth_dungeon >= world.hint_dist_user['dungeons_woth_limit'] and \
-        location.parent_region.dungeon) and \
-        (location.name not in world.hint_type_overrides['woth']) and \
-        (location.item.name not in world.item_hint_type_overrides['woth']),
+        location.name not in checked
+        and not (world.woth_dungeon >= world.hint_dist_user['dungeons_woth_limit'] and location.parent_region.dungeon)
+        and location.name not in world.hint_exclusions
+        and location.name not in world.hint_type_overrides['woth']
+        and location.item.name not in world.item_hint_type_overrides['woth'],
         locations))
 
     if not locations:
@@ -366,14 +366,16 @@ def is_not_checked(location, checked):
 
 
 def get_good_item_hint(spoiler, world, checked):
-    locations = [location for location in world.get_filled_locations()
-            if is_not_checked(location, checked) and \
-            (location.item.majoritem or \
-            location.name in world.added_hint_types['item'] or \
-            location.item.name in world.item_added_hint_types['item']) and \
-            not location.locked and \
-            (location.name not in world.hint_type_overrides['item']) and \
-            (location.item.name not in world.item_hint_type_overrides['item'])]
+    locations = list(filter(lambda location:
+        is_not_checked(location, checked)
+        and (location.item.majoritem
+            or location.name in world.added_hint_types['item']
+            or location.item.name in world.item_added_hint_types['item'])
+        and not location.locked
+        and location.name not in world.hint_exclusions
+        and location.name not in world.hint_type_overrides['item']
+        and location.item.name not in world.item_hint_type_overrides['item'],
+        world.get_filled_locations()))
     if not locations:
         return None
 
@@ -395,6 +397,7 @@ def get_specific_item_hint(spoiler, world, checked):
         locations = [
             location for location in world.get_filled_locations()
             if (is_not_checked(location, checked)
+                and location.name not in world.hint_exclusions
                 and location.item.name in bingoBottlesForHints
                 and not location.locked)
         ]
@@ -402,6 +405,7 @@ def get_specific_item_hint(spoiler, world, checked):
         locations = [
             location for location in world.get_filled_locations()
             if (is_not_checked(location, checked)
+                and location.name not in world.hint_exclusions
                 and location.item.name == itemname
                 and not location.locked)
         ]
@@ -421,14 +425,15 @@ def get_specific_item_hint(spoiler, world, checked):
 
 
 def get_random_location_hint(spoiler, world, checked):
-    locations = [location for location in world.get_filled_locations()
-            if is_not_checked(location, checked) and \
-            location.item.type not in ('Drop', 'Event', 'Shop', 'DungeonReward') and \
-            not (location.parent_region.dungeon and \
-                isRestrictedDungeonItem(location.parent_region.dungeon, location.item)) and
-            not location.locked and \
-            (location.name not in world.hint_type_overrides['item']) and \
-            (location.item.name not in world.item_hint_type_overrides['item'])]
+    locations = list(filter(lambda location:
+        is_not_checked(location, checked)
+        and location.item.type not in ('Drop', 'Event', 'Shop', 'DungeonReward')
+        and not (location.parent_region.dungeon and isRestrictedDungeonItem(location.parent_region.dungeon, location.item))
+        and not location.locked
+        and location.name not in world.hint_exclusions
+        and location.name not in world.hint_type_overrides['item']
+        and location.item.name not in world.item_hint_type_overrides['item'],
+        world.get_filled_locations()))
     if not locations:
         return None
 
@@ -872,7 +877,13 @@ def buildBridgeReqsString(world):
         string += "The awakened ones will have #already created a bridge# to the castle where the evil dwells."
     else:
         item_req_string = getHint('bridge_' + world.bridge, world.clearer_hints).text
-        if world.bridge == 'tokens':
+        if world.bridge == 'medallions':
+            item_req_string = str(world.bridge_medallions) + ' ' + item_req_string
+        elif world.bridge == 'stones':
+            item_req_string = str(world.bridge_stones) + ' ' + item_req_string
+        elif world.bridge == 'dungeons':
+            item_req_string = str(world.bridge_rewards) + ' ' + item_req_string
+        elif world.bridge == 'tokens':
             item_req_string = str(world.bridge_tokens) + ' ' + item_req_string
         if '#' not in item_req_string:
             item_req_string = '#%s#' % item_req_string
@@ -887,6 +898,14 @@ def buildGanonBossKeyString(world):
     else:
         if 'lacs_' in world.shuffle_ganon_bosskey:
             item_req_string = getHint(world.shuffle_ganon_bosskey, world.clearer_hints).text
+            if world.lacs_condition == 'medallions':
+                item_req_string = str(world.lacs_medallions) + ' ' + item_req_string
+            elif world.lacs_condition == 'stones':
+                item_req_string = str(world.lacs_stones) + ' ' + item_req_string
+            elif world.lacs_condition == 'dungeons':
+                item_req_string = str(world.lacs_rewards) + ' ' + item_req_string
+            elif world.lacs_condition == 'tokens':
+                item_req_string = str(world.lacs_tokens) + ' ' + item_req_string
             if '#' not in item_req_string:
                 item_req_string = '#%s#' % item_req_string
             bk_location_string = "provided by Zelda once %s are retrieved" % item_req_string
