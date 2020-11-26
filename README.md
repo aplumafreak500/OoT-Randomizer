@@ -260,6 +260,7 @@ do that.
 * Move the Stone of Agony indicator above any small keys if both are present.
 * Fix model/icon colors in `Item Model Colors Match Cosmetics` not returning to default with a cosmetic patch setting them to defaults.
 * Ensure Ganondorf always hints one of the first reachable Light Arrows.
+* Don't require that child can reach Ganondorf in order for Light Arrows not to be hinted WotH.
 * Allow playthrough to collect a second 'Bottle with Letter' as its first empty bottle.
 * Fix some issues with `Randomize Main Rules`:
   * Closed Forest implies starting as child.
@@ -277,6 +278,7 @@ do that.
 #### Other Changes
 * Most locations and a few items have been renamed to improve spoiler output and standardize.
   * This will break settings and distribution files from previous versions that reference these locations and items.
+* Reordered locations more naturally in the locations part of the spoiler.
 * Default for `Shuffle Weird Egg` is now off.
 * In-game hints overhaul.
 * File 3 has been removed from generated ROMs to free up some space.
