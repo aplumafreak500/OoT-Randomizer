@@ -9,7 +9,7 @@ from Rules import set_entrances_based_rules
 from Entrance import Entrance
 from State import State
 from Item import ItemFactory
-from Hints import get_hint_area
+from Hints import get_hint_area, HintAreaNotFound
 
 
 def set_all_entrances_data(world):
@@ -315,7 +315,7 @@ entrance_shuffle_table = [
     ('Overworld',       ('GV Lower Stream -> Lake Hylia',                                   { 'index': 0x0219 })),
 
     ('OwlDrop',         ('LH Owl Flight -> Hyrule Field',                                   { 'index': 0x027E, 'addresses': [0xAC9F26] })),
-    ('OwlDrop',         ('DMT Owl Flight -> Kak Impas Ledge',                               { 'index': 0x0554, 'addresses': [0xAC9EF2] })),
+    ('OwlDrop',         ('DMT Owl Flight -> Kak Impas Rooftop',                             { 'index': 0x0554, 'addresses': [0xAC9EF2] })),
 
     ('Spawn',           ('Child Spawn -> KF Links House',                                   { 'index': 0x00BB, 'addresses': [0xB06342] })),
     ('Spawn',           ('Adult Spawn -> Temple of Time',                                   { 'index': 0x05F4, 'addresses': [0xB06332] })),
@@ -434,7 +434,7 @@ def shuffle_random_entrances(worlds):
                 valid_target_types = ('Spawn', 'WarpSong', 'OwlDrop', 'Overworld', 'Interior', 'SpecialInterior', 'Extra')
                 one_way_target_entrance_pools[pool_type] = build_one_way_targets(world, valid_target_types)
             elif pool_type == 'WarpSong':
-                valid_target_types = ('Spawn', 'WarpSong', 'OwlDrop', 'Overworld', 'Interior', 'SpecialInterior', 'Grave', 'Extra')
+                valid_target_types = ('Spawn', 'WarpSong', 'OwlDrop', 'Overworld', 'Interior', 'SpecialInterior', 'Extra')
                 one_way_target_entrance_pools[pool_type] = build_one_way_targets(world, valid_target_types)
             # Ensure that when trying to place the last entrance of a one way pool, we don't assume the rest of the targets are reachable
             for target in one_way_target_entrance_pools[pool_type]:
@@ -650,11 +650,12 @@ def validate_world(world, worlds, entrance_placed, locations_to_ensure_reachable
 
     if world.shuffle_interior_entrances and \
        (entrance_placed == None or entrance_placed.type in ['Interior', 'SpecialInterior']):
-        # When cows are shuffled, ensure both Impa's House entrances are in the same hint region because the cow is reachable from both sides
+        # When cows are shuffled, ensure both Impa's House entrances are in the same hint area because the cow is reachable from both sides
         if world.shuffle_cows:
             impas_front_entrance = get_entrance_replacing(world.get_region('Kak Impas House'), 'Kakariko Village -> Kak Impas House')
             impas_back_entrance = get_entrance_replacing(world.get_region('Kak Impas House Back'), 'Kak Impas Ledge -> Kak Impas House Back')
-            check_same_hint_region(impas_front_entrance, impas_back_entrance)
+            if impas_front_entrance is not None and impas_back_entrance is not None and not same_hint_area(impas_front_entrance, impas_back_entrance):
+                raise EntranceShuffleError('Kak Impas House entrances are not in the same hint area')
 
     if (world.shuffle_special_interior_entrances or world.shuffle_overworld_entrances or world.spawn_positions) and \
        (entrance_placed == None or (world.mix_entrance_pools != 'off') or entrance_placed.type in ['SpecialInterior', 'Overworld', 'Spawn', 'WarpSong', 'OwlDrop']):
@@ -720,19 +721,27 @@ def entrance_unreachable_as(entrance, age, already_checked=None):
     return True
 
 
-# Shorthand function to check and validate that two entrances are in the same hint region
-def check_same_hint_region(first, second):
-    if  first.parent_region.hint is not None and second.parent_region.hint is not None and \
-        first.parent_region.hint != second.parent_region.hint:
-        raise EntranceShuffleError('Entrances are not in the same hint region')
+# Returns whether two entrances are in the same hint area
+def same_hint_area(first, second):
+    try:
+        return get_hint_area(first) == get_hint_area(second)
+    except HintAreaNotFound:
+        return False
 
 
 # Shorthand function to find an entrance with the requested name leading to a specific region
 def get_entrance_replacing(region, entrance_name):
+    original_entrance = region.world.get_entrance(entrance_name)
+
+    if not original_entrance.shuffled:
+        return original_entrance
+
     try:
-        return next(filter(lambda entrance: entrance.replaces and entrance.replaces.name == entrance_name, region.entrances))
+        return next(filter(lambda entrance: entrance.replaces and entrance.replaces.name == entrance_name and \
+                                            entrance.parent_region and entrance.parent_region.name != 'Root Exits' and \
+                                            entrance.type not in ('OwlDrop', 'Spawn', 'WarpSong'), region.entrances))
     except StopIteration:
-        return region.world.get_entrance(entrance_name)
+        return None
 
 
 # Change connections between an entrance and a target assumed entrance, in order to test the connections afterwards if necessary
